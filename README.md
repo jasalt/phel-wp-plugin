@@ -1,5 +1,7 @@
 Demo plugin that adds admin widget printing some content with [Phel](https://phel-lang.org/).
 
+![Image of WordPress 6.6.1 Admin Dashboard with this plugin installed](demo.png "WordPress 6.6.1 Admin Dashboard with this plugin installed")
+
 # Installation
 
 1) Run (local) WordPress installation (eg. [VVV Vagrant](https://varyingvagrantvagrants.org/)).
