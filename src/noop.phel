@@ -1,0 +1,4 @@
+(ns phel-test\noop)
+
+# does nothing, used as workaround as something to load on phel init
+# to avoid startup deprecation messages printed on page output
