@@ -1,8 +1,14 @@
 (ns phel-test\main)
 
-(println "Hello, World!")
-(println "Your WordPress account name is: ")
+(defn phel-widget-content []
+  (println "Hello, World!")
+  (println "Your WordPress account name is: ")
 
-(-> (php/wp_get_current_user)
-    (php/-> user_login)
-    println)
+  (-> (php/wp_get_current_user)
+      (php/-> user_login)
+      println))
+
+(php/add_action "wp_dashboard_setup"
+                (fn [] (php/wp_add_dashboard_widget "phel-widget-id"
+                                                    "This is Phel content"
+                                                    phel-widget-content)))
