@@ -1,4 +1,4 @@
-(ns phel-test\main)
+(ns phel-wp-plugin\main)
 
 (defn phel-widget-content []
   (println "Hello, World!")
