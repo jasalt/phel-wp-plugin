@@ -1,10 +1,10 @@
 <?php
 /*
-Plugin Name: Phel test plugin
-Description: A brief description of my plugin.
-Version: 1.0
-Author: Your Name
-Author URI: https://yourwebsite.com
+Plugin Name: Phel demo plugin
+Description: Adds admin widget printing some content with Phel
+Version: 0.1
+Author: Jarkko Saltiola
+Author URI: https://codeberg.org/jasalt
 */
 
 use Phel\Phel;
@@ -13,19 +13,11 @@ $projectRootDir = __DIR__ . '/';
 
 require $projectRootDir . 'vendor/autoload.php';
 
-/* dashboard widget */
-function phel_widget() {
-	global $projectRootDir;
+global $projectRootDir;
 
-	// HACK to avoid deprecation messages on phel startup
-	ob_start();
-	Phel::run($projectRootDir, 'phel-test\main');
-	ob_end_clean();
+// HACK to avoid deprecation messages printed on page on phel startup
+ob_start();
+Phel::run($projectRootDir, 'phel-test\noop');
+ob_end_clean();
 
-	Phel::run($projectRootDir, 'phel-test\main');
-}
-
-// Dashboard initialisation hook
-add_action('wp_dashboard_setup', function(){
-	wp_add_dashboard_widget('phel-widget', 'phel content', 'phel_widget');
-});
+Phel::run($projectRootDir, 'phel-test\main');
