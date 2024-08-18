@@ -16,6 +16,12 @@ require $projectRootDir . 'vendor/autoload.php';
 /* dashboard widget */
 function phel_widget() {
 	global $projectRootDir;
+
+	// HACK to avoid deprecation messages on phel startup
+	ob_start();
+	Phel::run($projectRootDir, 'phel-test\main');
+	ob_end_clean();
+
 	Phel::run($projectRootDir, 'phel-test\main');
 }
 
