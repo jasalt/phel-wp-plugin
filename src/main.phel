@@ -1,3 +1,8 @@
 (ns phel-test\main)
 
 (println "Hello, World!")
+(println "Your WordPress account name is: ")
+
+(-> (php/wp_get_current_user)
+    (php/-> user_login)
+    println)
