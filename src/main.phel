@@ -1,4 +1,7 @@
-(ns phel-wp-plugin\main)
+(ns phel-wp-plugin\main
+  (:require phel\html :refer [html]))
+
+(def wishlist-items [1 2 3])
 
 (defn phel-widget-content []
   (println "Hello, World!")
@@ -6,7 +9,12 @@
 
   (-> (php/wp_get_current_user)
       (php/-> user_login)
-      println))
+      println)
+
+  (println (html [:strong "HTMLää"
+                  [:div
+                   (for [item :in wishlist-items]
+                     [:h1 item])]])))
 
 (php/add_action "wp_dashboard_setup"
                 (fn [] (php/wp_add_dashboard_widget "phel-widget-id"
