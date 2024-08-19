@@ -1,7 +1,7 @@
 (ns phel-wp-plugin\main
   (:require phel\html :refer [html]))
 
-(def wishlist-items [1 2 3])
+(def posts (php/get_posts {"post_type" "post"}))
 
 (defn phel-widget-content []
   (println "Hello, World!")
@@ -11,10 +11,13 @@
       (php/-> user_login)
       println)
 
-  (println (html [:strong "HTMLää"
-                  [:div
-                   (for [item :in wishlist-items]
-                     [:h1 item])]])))
+  (println (html [:div
+                  [:h2 "All Posts"]
+                  [:ul
+                   (for [item :in posts]
+                     [:li
+                      (php/-> item post_title) " "
+                      [:a {:href (php/get_permalink item)} "hyperlink"]])]])))
 
 (php/add_action "wp_dashboard_setup"
                 (fn [] (php/wp_add_dashboard_widget "phel-widget-id"
