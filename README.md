@@ -10,11 +10,23 @@ Demo plugin that adds admin widget printing some content with [Phel](https://phe
 4) Activate plugin on plugin management page or with `wp plugin activate phel-wp-plugin` and open Admin Dashboard (`/wp-admin`) where this widget should be visible.
 
 # Used workarounds
+
 ## `phel-config.php`
 
 - XDebug's (included with VVV) infinite loop detection gives false positive on default setting and requires `ini_set('xdebug.max_nesting_level', 300);`
 - Error log file path needs to be set into existing directory, set into plugin dir with `->setErrorLogFile($projectRootDir . 'error.log')`
 
-## `phel-wp-plugin.php`
+# Troubleshooting
+## Upgrading from phel 0.15.1
+Delete cache files `rm -rf data/.cache/` after `composer update`. Following should be fixed:
 
-Phel currently has issue (https://github.com/phel-lang/web-skeleton/issues/4) with some deprecation messages printing in web page. This was avoided using output buffering on first `Phel::run` and discarding it's initial startup message from HTML output (should get logged to `error.log` still). May lead to some unexpected side effects.
+Deprecation warning appearing on page with 0.15.1 ([Phel repo issue](https://github.com/phel-lang/web-skeleton/issues/4)):
+```
+Error Unknown(4437) found! message: "Since gacela-project/gacela 1.8: `Gacela\Framework\AbstractDependencyProvider` is deprecated and will be removed in version 2.0. Use `Gacela\Framework\AbstractProvider` instead.
+```
+
+Fatal error after updating to 0.15.2 (because of cached files):
+```
+Uncaught TypeError: Gacela\Framework\ClassResolver\AbstractClassResolver::createInstance(): Return value must be of type object, null returned in /srv/www/wordpress-one/public_html/wp-content/pl
+ugins/phel-wp-wishlist/vendor/gacela-project/gacela/src/Framework/ClassResolver/AbstractClassResolver.php:151
+```
