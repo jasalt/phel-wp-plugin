@@ -1,7 +1,6 @@
 (ns phel-wp-plugin\main
   (:require phel\html :refer [html]))
 
-# :post_type "wishlist-item"
 (def posts (php/get_posts
             (to-php-array {"post_type" "post"
                            "numberposts" 2})))
