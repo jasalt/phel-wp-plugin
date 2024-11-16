@@ -15,7 +15,9 @@ services:
       - '8443:8443'
     volumes:
       - 'wordpress_data:/bitnami/wordpress'
-      - '.:/bitnami/wordpress/wp-content/plugins/phel-wp-plugin'
+      # plugin mount cannot be inside named volume at least initially,
+      # workaround by symlinking plugin into plugins dir
+      - '.:/bitnami/phel-wp-plugin'
     depends_on:
       - mariadb
     environment:
