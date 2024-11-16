@@ -15,6 +15,7 @@ services:
       - '8443:8443'
     volumes:
       - 'wordpress_data:/bitnami/wordpress'
+      - '.:/bitnami/wordpress/wp-content/plugins/phel-wp-plugin'
     depends_on:
       - mariadb
     environment:
