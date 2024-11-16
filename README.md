@@ -18,11 +18,13 @@ Various local development environment tools can be also used, eg. [VVV Vagrant](
 For quick and simple local dev installation `docker-compose.yml` file is included which uses [Bitnami WordPress](https://hub.docker.com/r/bitnami/wordpress/) image that runs Apache web server as non-root user (UID 1001). As this folder gets mounted inside the container `wp-content/plugins/` path, it's permissions need to be set  so container user can write inside it (eg. Phel temp files).
 
 ```
-git clone <repo-url>
+git clone <repo-url> phel-wp-plugin
 sudo chmod -R 777 phel-wp-plugin
-chmod -R 777
+cd phel-wp-plugin
 docker compose up
 ```
+Access via http://localhost:8081.
+
 
 TODO change to less broad permission eg. (might fail on Mac?)
 sudo chmod -R 775 phel-wp-plugin
