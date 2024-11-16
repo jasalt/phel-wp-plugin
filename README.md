@@ -5,6 +5,8 @@ Adds admin widget, interfaces a little bit with WordPress database and outputs s
 
 # Installation on existing WordPress instance
 
+Please note that this project is in experimental state, doesn't come with any warranties and might lead to dangerous security issues if used in production without sufficient care taken.
+
 Generally plugin can be installed as follows:
 
 1) Clone this repository into existing WP installation path `wp-content/plugins/phel-wp-plugin`.
@@ -15,20 +17,26 @@ Various local development environment tools can be also used, eg. [VVV Vagrant](
 
 ## Docker Compose setup
 
-For quick and simple local dev installation `docker-compose.yml` file is included which uses [Bitnami WordPress](https://hub.docker.com/r/bitnami/wordpress/) image that runs Apache web server as non-root user (UID 1001). As this folder gets mounted inside the container `wp-content/plugins/` path, it's permissions need to be set  so container user can write inside it (eg. Phel temp files).
+For quick and simple local dev installation `docker-compose.yml` file is included which uses [Bitnami WordPress](https://hub.docker.com/r/bitnami/wordpress/) image.
 
 ```
 git clone <repo-url> phel-wp-plugin
-sudo chmod -R 777 phel-wp-plugin
 cd phel-wp-plugin
 docker compose up
 ```
-Access via http://localhost:8081.
 
+Following success message, access WP admin via http://localhost:8081/wp-admin with credentials user: "admin" password: "password".
 
-TODO change to less broad permission eg. (might fail on Mac?)
+### Write permissions issues
+
+Previous seemingly works as is on Docker Desktop on Mac, but as container runs Apache web server as non-root user (UID 1001), there might be issues on more strict environments eg. on Debian Linux. As this folder gets mounted inside the container `wp-content/plugins/` path, it's permissions need to be set so that container user can write inside it for eg. Phel logs, temp files etc.
+
+Simple solution is to allow world read-write permission by running `sudo chmod -R 777 phel-wp-plugin`, but something like following would be more wise at least on shared operating systems:
+
+```
 sudo chmod -R 775 phel-wp-plugin
-sudo chown -R 101000:user
+sudo chown -R 101000:user  # TODO figure out UID mapping on host
+```
 
 # Notes on REPL usage
 In [Phel REPL](https://phel-lang.org/documentation/repl/) (starts with `vendor/bin/phel repl`), the WordPress context can be loaded by running `(php/require_once "../../../wp-load.php")`.
