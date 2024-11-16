@@ -1,18 +1,37 @@
-Demo plugin that adds admin widget printing some content with [Phel](https://phel-lang.org/).
+Experimental WordPress plugin skeleton made with [Phel](https://phel-lang.org/).
+Adds admin widget, interfaces a little bit with WordPress database and outputs some html using Phel html library.
 
 ![Image of WordPress 6.6.1 Admin Dashboard with this plugin installed](demo.png "WordPress 6.6.1 Admin Dashboard with this plugin installed")
 
-# Installation
+# Installation on existing WordPress instance
 
-1) Run (local) WordPress installation (eg. [VVV Vagrant](https://varyingvagrantvagrants.org/)).
-2) Clone this repository into `wp-content/plugins/phel-wp-plugin`.
-3) Install composer dependencies with `cd phel-wp-plugin && composer install`.
-4) Activate plugin on plugin management page or with `wp plugin activate phel-wp-plugin` and open Admin Dashboard (`/wp-admin`) where this widget should be visible.
+Generally plugin can be installed as follows:
+
+1) Clone this repository into existing WP installation path `wp-content/plugins/phel-wp-plugin`.
+2) Install Composer dependencies with `cd phel-wp-plugin && composer install`.
+3) Activate plugin on plugin management page or with `wp plugin activate phel-wp-plugin` and open Admin Dashboard (`/wp-admin`) where this widget should be visible.
+
+Various local development environment tools can be also used, eg. [VVV Vagrant](https://varyingvagrantvagrants.org/) or [LocalWP](https://localwp.com/).
+
+## Docker Compose setup
+
+For quick and simple local dev installation `docker-compose.yml` file is included which uses [Bitnami WordPress](https://hub.docker.com/r/bitnami/wordpress/) image that runs Apache web server as non-root user (UID 1001). As this folder gets mounted inside the container `wp-content/plugins/` path, it's permissions need to be set  so container user can write inside it (eg. Phel temp files).
+
+```
+git clone <repo-url>
+sudo chmod -R 777 phel-wp-plugin
+chmod -R 777
+docker compose up
+```
+
+TODO change to less broad permission eg. (might fail on Mac?)
+sudo chmod -R 775 phel-wp-plugin
+sudo chown -R 101000:user
 
 # Notes on REPL usage
-In [Phel REPL](https://phel-lang.org/documentation/repl/) (starts with `vendor/bin/phel repl`), the WordPress context can be loaded by running `(php/require_once "../../../wp-load.php")`, which provides environment close to vanilla PHP WP-CLI tool's `wp shell` command.
+In [Phel REPL](https://phel-lang.org/documentation/repl/) (starts with `vendor/bin/phel repl`), the WordPress context can be loaded by running `(php/require_once "../../../wp-load.php")`.
 
-If developing a plugin using this skeleton project that is activated and gets loaded during WordPress initialization (eg. via `wp-load.php`), the REPL environment might be messed up at that point with utilities like `use` and `doc` becoming unavailable.
+If developing a plugin using this skeleton project that is activated and gets loaded during WordPress initialization (eg. via `wp-load.php`), the REPL environment might be messed up at that point with utilities like `use` and `doc` becoming unavailable ([see issue](https://github.com/phel-lang/phel-lang/issues/766)).
 
 To avoid this, some REPL session aware conditional loading in plugin code is required, by eg. patching `phel-wp-plugin.php` to avoid running `Phel::run` during REPL session: 
 
