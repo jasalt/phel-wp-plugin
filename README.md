@@ -27,6 +27,8 @@ docker compose up
 
 Following success message, access WP admin via http://localhost:8081/wp-admin with credentials user: "admin" password: "password".
 
+Try edit `src/main.phel` and see changes after page refresh etc.
+
 ### Write permissions issues
 
 Previous seemingly works as is on Docker Desktop on Mac, but as container runs Apache web server as non-root user (UID 1001), there might be issues on more strict environments eg. on Debian Linux. As this folder gets mounted inside the container `wp-content/plugins/` path, it's permissions need to be set so that container user can write inside it for eg. Phel logs, temp files etc.
