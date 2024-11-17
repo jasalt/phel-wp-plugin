@@ -1,5 +1,13 @@
 {
-    "require": {
-        "phel-lang/phel-lang": "^0.15.2"
-    }
+  "require": {
+    "php": ">=8.2",
+    "phel-lang/phel-lang": "dev-main"
+  },
+  "minimum-stability": "dev",
+  "config": {
+    "platform": {
+      "php": "8.2"
+    },
+    "sort-packages": true
+  }
 }
