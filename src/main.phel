@@ -4,14 +4,14 @@
 (def posts (php/get_posts
             (to-php-array {"post_type" "post"
                            "numberposts" 2})))
+(defn current-user-name []
+  (-> (php/wp_get_current_user)
+      (php/-> user_login)))
 
 (defn phel-widget-content []
   (println "Hello, World!")
   (println "Your WordPress account name is: ")
-
-  (-> (php/wp_get_current_user)
-      (php/-> user_login)
-      println)
+  (println (current-user-name))
 
   (println (html [:div
                   [:h2 "All Posts"]
