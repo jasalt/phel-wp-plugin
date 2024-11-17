@@ -21,24 +21,20 @@ For quick and simple local dev installation `docker-compose.yml` file is include
 
 ```
 git clone <repo-url> phel-wp-plugin
+# sudo chmod -R 777 phel-wp-plugin  # probably required on linux
 cd phel-wp-plugin
-docker compose up
+docker compose up  # or podman-compose up
 ```
 
 Following success message, access WP admin via http://localhost:8081/wp-admin with credentials user: "admin" password: "password".
 
 Try edit `src/main.phel` and see changes after page refresh etc.
 
-### Write permissions issues
+### Write permissions with volume mount
 
-Previous seemingly works as is on Docker Desktop on Mac, but as container runs Apache web server as non-root user (UID 1001), there might be issues on more strict environments eg. on Debian Linux. As this folder gets mounted inside the container `wp-content/plugins/` path, it's permissions need to be set so that container user can write inside it for eg. Phel logs, temp files etc.
+Container runs Apache web server as non-root user (UID 1001) which cannot write to the mounted volume (this folder) for installing Composer dependencies, writing Phel logs, temp files etc. and may lead to permission errors.
 
-Simple solution is to allow world read-write permission by running `sudo chmod -R 777 phel-wp-plugin`, but something like following would be more wise at least on shared operating systems:
-
-```
-sudo chmod -R 775 phel-wp-plugin
-sudo chown -R 101000:user  # TODO figure out UID mapping on host
-```
+On a single user laptop used for developing `sudo chmod -R 777 phel-wp-plugin` is probably enough, but more narrow permission for the container user UID would be better for security on multi-user system.
 
 # Notes on REPL usage
 In [Phel REPL](https://phel-lang.org/documentation/repl/) (starts with `vendor/bin/phel repl`), the WordPress context can be loaded by running `(php/require_once "../../../wp-load.php")`.
