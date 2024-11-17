@@ -15,13 +15,14 @@ services:
       - '8443:8443'
     volumes:
       - 'wordpress_data:/bitnami/wordpress'
-      # linking phel-lang from local to vendor
+      # (optional) linking phel-lang from local to vendor
       - '../../phel-lang/phel-lang:/bitnami/phel-lang'
       # plugin mount cannot be inside named volume mount at least initially
       # https://github.com/moby/moby/issues/26051#issuecomment-125618978 (?)
       # workaround by symlinking plugin into plugins dir in post-init script
       - '.:/bitnami/phel-wp-plugin'
       - './docker-post-init-scripts:/docker-entrypoint-init.d'
+    working_dir: /bitnami/wordpress/wp-content/plugins/phel-wp-plugin
     depends_on:
       - mariadb
     environment:
