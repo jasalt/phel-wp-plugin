@@ -9,9 +9,6 @@ Author URI: https://codeberg.org/jasalt
 
 use Phel\Phel;
 
-$projectRootDir = __DIR__ . '/';
-error_log($projectRootDir);
-
 require $projectRootDir . 'vendor/autoload.php';
 
 Phel::run($projectRootDir, 'phel-wp-plugin\main');
