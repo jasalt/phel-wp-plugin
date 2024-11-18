@@ -22,7 +22,11 @@ services:
       # workaround by symlinking plugin into plugins dir in post-init script
       - '.:/bitnami/phel-wp-plugin'
       - './docker-post-init-scripts:/docker-entrypoint-init.d'
-    working_dir: /bitnami/wordpress/wp-content/plugins/phel-wp-plugin
+
+    # TODO this makes startup from scratch fail, so uncomment it after first run
+    #      if you feel like using it
+    # working_dir: /bitnami/wordpress/wp-content/plugins/phel-wp-plugin
+
     depends_on:
       - mariadb
     environment:
