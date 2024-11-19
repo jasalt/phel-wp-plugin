@@ -19,7 +19,7 @@ Generally plugin can be installed as follows on a live WordPress site or on deve
 For quick and simple local dev installation `docker-compose.yml` file is included which uses [Bitnami WordPress](https://hub.docker.com/r/bitnami/wordpress/) image. This can be especially useful also for providing re-producible bug reports.
 
 ```
-git clone <repo-url> phel-wp-plugin
+git clone git@github.com:jasalt/phel-wp-plugin.git
 # sudo chmod -R 777 phel-wp-plugin  # probably required on Linux
 cd phel-wp-plugin
 docker compose up  # or podman-compose up
