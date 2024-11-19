@@ -39,7 +39,7 @@ On a single user laptop used for developing `sudo chmod -R 777 phel-wp-plugin` i
 
 Refer to [Phel documentation on Editor support](https://phel-lang.org/documentation/getting-started/#editor-support). Some discussion also about Emacs REPL integration  https://github.com/phel-lang/phel-lang/discussions/762.
 
-# REPL usage
+## REPL usage
 In [Phel REPL](https://phel-lang.org/documentation/repl/) (starts with `vendor/bin/phel repl`), the WordPress context can be loaded by running `(php/require_once "../../../wp-load.php")`.
 
 If developing a plugin using this skeleton project that is activated and gets loaded during WordPress initialization (eg. via `wp-load.php`), the REPL environment might be messed up at that point with utilities like `use` and `doc` becoming unavailable ([see issue](https://github.com/phel-lang/phel-lang/issues/766)).
