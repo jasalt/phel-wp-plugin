@@ -4,7 +4,9 @@ Experimental WordPress plugin skeleton made with [Phel](https://phel-lang.org/).
 
 Please note that this project is in experimental state, doesn't come with any warranties and might lead to dangerous security issues if used in production without sufficient care taken.
 
-# Installation on existing WordPress instance
+# Installation
+
+## Existing WordPress instance
 
 Generally plugin can be installed as follows on a live WordPress site or on development server such as [VVV Vagrant](https://varyingvagrantvagrants.org/) or [LocalWP](https://localwp.com/):
 
@@ -12,9 +14,9 @@ Generally plugin can be installed as follows on a live WordPress site or on deve
 2) Install Composer dependencies with `cd phel-wp-plugin && composer install`.
 3) Activate plugin on plugin management page or with `wp plugin activate phel-wp-plugin` and open Admin Dashboard (`/wp-admin`) where this widget should be visible.
 
-## Docker Compose setup
+## Development container
 
-For quick and simple local dev installation `docker-compose.yml` file is included which uses [Bitnami WordPress](https://hub.docker.com/r/bitnami/wordpress/) image. This can be especially useful for providing re-producible bug reports.
+For quick and simple local dev installation `docker-compose.yml` file is included which uses [Bitnami WordPress](https://hub.docker.com/r/bitnami/wordpress/) image. This can be especially useful also for providing re-producible bug reports.
 
 ```
 git clone <repo-url> phel-wp-plugin
