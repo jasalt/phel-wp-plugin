@@ -35,7 +35,11 @@ Container runs Apache web server as non-root user (UID 1001) which cannot write 
 
 On a single user laptop used for developing `sudo chmod -R 777 phel-wp-plugin` is probably enough, but more narrow permission for the container user UID would be better for security on multi-user system.
 
-# Notes on REPL usage
+# Editor support
+
+Refer to [Phel documentation on Editor support](https://phel-lang.org/documentation/getting-started/#editor-support). Some discussion also about Emacs REPL integration  https://github.com/phel-lang/phel-lang/discussions/762.
+
+# REPL usage
 In [Phel REPL](https://phel-lang.org/documentation/repl/) (starts with `vendor/bin/phel repl`), the WordPress context can be loaded by running `(php/require_once "../../../wp-load.php")`.
 
 If developing a plugin using this skeleton project that is activated and gets loaded during WordPress initialization (eg. via `wp-load.php`), the REPL environment might be messed up at that point with utilities like `use` and `doc` becoming unavailable ([see issue](https://github.com/phel-lang/phel-lang/issues/766)).
@@ -52,13 +56,10 @@ if (isset($PHP_SELF) && $PHP_SELF !== "./vendor/bin/phel"){
 }
 ```
 
-## Editor support
-
-Refer to [Phel documentation on Editor support](https://phel-lang.org/documentation/getting-started/#editor-support). Some discussion also about Emacs REPL integration  https://github.com/phel-lang/phel-lang/discussions/762.
 
 # Used workarounds
 
 ## `phel-config.php`
 
 - XDebug's (included with VVV) infinite loop detection gives false positive on default setting and requires `ini_set('xdebug.max_nesting_level', 300);`
-- Error log file path needs to be set into existing directory, set into plugin dir with `->setErrorLogFile($projectRootDir . 'error.log')`
+- Compatibility between with Phel and WordPress error logging facilities is work-in-progress. Currently error log file path is set into plugin dir with `->setErrorLogFile($projectRootDir . 'error.log')`, but this should be changed for production.
