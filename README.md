@@ -6,6 +6,8 @@ Please note that this project is in experimental state, doesn't come with any wa
 
 # Installation
 
+Phel requires minimum PHP version 8.2 and Composer. Composer is not required if `vendor` directory is included with the plugin distribution.
+
 ## Existing WordPress instance
 
 Generally plugin can be installed as follows on a live WordPress site or on development server such as [VVV Vagrant](https://varyingvagrantvagrants.org/) or [LocalWP](https://localwp.com/):
