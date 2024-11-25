@@ -59,18 +59,17 @@ In [Phel REPL](https://phel-lang.org/documentation/repl/) (starts with `vendor/b
 
 If developing a plugin using this skeleton project that is activated and gets loaded during WordPress initialization (eg. via `wp-load.php`), the REPL environment might be messed up at that point with utilities like `use` and `doc` becoming unavailable ([see issue](https://github.com/phel-lang/phel-lang/issues/766)).
 
-To avoid this, some REPL session aware conditional loading in plugin code is required, by eg. patching `phel-wp-plugin.php` to avoid running `Phel::run` during REPL session: 
+To avoid this, some REPL session aware conditional loading in plugin code is required, by eg. patching `phel-wp-plugin.php` to avoid running `Phel::run` during REPL session the following way:
 
 ```
-// Avoid loading plugin during Phel REPL session so that REPL helpers stay available
+// Skip initializing Phel again during REPL session
 if (isset($PHP_SELF) && $PHP_SELF !== "./vendor/bin/phel"){
 	Phel::run($projectRootDir, 'phel-wp-plugin\main');
 } else {
+	// This else is for debugging purposes and could be removed
 	print("Running REPL, skip running plugin Phel::run \n");
-	// TODO how to load plugin phel code then?
 }
 ```
-
 
 # Used workarounds
 
