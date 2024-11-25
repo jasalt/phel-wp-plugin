@@ -29,7 +29,20 @@ docker compose up  # or podman-compose up
 
 Following success message, access WP admin via http://localhost:8081/wp-admin with credentials user: "admin" password: "password". Try edit `src/main.phel` and see changes after page refresh etc.
 
-Custom initialization scripts can be added to `docker-post-init-scripts` directory which get executed after container is created.
+Additionally you can run Phel command line commands, including REPL eg. the following way:
+
+```
+docker compose exec -w /opt/bitnami/wordpress/wp-content/plugins/phel-wp-plugin wordpress bash
+./vendor/bin/phel --help
+./vendor/bin/phel --version
+./vendor/bin/phel repl
+(php/require_once "/opt/bitnami/wordpress/wp-load.php")
+(php/get_bloginfo "name")
+```
+
+Note that to include your own namespaces declared in the plugin directory with `require`, the shell working directory should be set to plugin root directory before starting REPL. Also with the current container setup, referring to WP Core is more reliable via absolute path.
+
+Custom initialization scripts can be added to `docker-post-init-scripts` directory which get executed after container is created for tailored experience.
 
 ### Write permissions with volume mount
 
