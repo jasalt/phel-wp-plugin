@@ -1,3 +1,6 @@
 .idea/
-/vendor/
-/data/
+data/
+local/
+vendor/
+
+phel-config-local.php
