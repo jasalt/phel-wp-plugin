@@ -1,4 +1,4 @@
-* Experimental WordPress plugin skeleton made with [Phel](https://phel-lang.org/). Adds admin widget, interfaces a little bit with WordPress database and outputs some html using Phel html library.
+Experimental WordPress plugin skeleton made with [Phel](https://phel-lang.org/). Adds admin widget, interfaces a little bit with WordPress database and outputs some html using Phel html library.
 
 ![Image of WordPress 6.6.1 Admin Dashboard with this plugin installed](demo.png "WordPress 6.6.1 Admin Dashboard with this plugin installed")
 
@@ -90,7 +90,7 @@ if (isset($PHP_SELF) && $PHP_SELF !== "./vendor/bin/phel"){
 
 When evaluating Phel files during interactive development session, evaluating the regular `ns` forms may need to be avoided and Phel REPL specific functions `use` and `require` should be used instead. 
 
-Improvement ideas in workflow regarding to this are welcome. Issues regarding to general Phel REPL experience can been raised in [phel-lang](https://github.com/phel-lang/phel-lang/issues) repository.
+Improvement ideas in workflow regarding to this are welcome. Issues regarding to general Phel REPL experience can be raised in [phel-lang](https://github.com/phel-lang/phel-lang/issues) repository.
 
 # Editor support
 
