@@ -50,14 +50,30 @@ Container runs Apache web server as non-root user (UID 1001) which cannot write 
 
 On a single user laptop used for developing `sudo chmod -R 777 phel-wp-plugin` is probably enough, but more narrow permission for the container user UID would be better for security on multi-user system.
 
-# Editor support
+# REPL usage
+[Phel REPL](https://phel-lang.org/documentation/repl/) starts with `vendor/bin/phel repl` command. Quick way to connect to into running development container:
+```
+docker compose exec -w /opt/bitnami/wordpress/wp-content/plugins/phel-wp-plugin wordpress vendor/bin/phel repl
+```
+Interfacing with the REPL works mostly as expected, examples:
+```
+(php/require_once "../../../wp-load.php")  # instantiate WordPress
+(get php/$GLOBALS "wpdb")                  # refer to wpdb for database operations
 
-Refer to [Phel documentation on Editor support](https://phel-lang.org/documentation/getting-started/#editor-support). Some discussion also about Emacs REPL integration  https://github.com/phel-lang/phel-lang/discussions/762.
+(require phel\html :refer [html])          # load Phel core libraries
+(require phel-wp-plugin\my-other-ns :as my-other-ns)  # load a Phel source file from src/
+(use \Laminas\XmlRpc\Client)               # load installed Composer PHP libraries
+```
 
-## REPL usage
-In [Phel REPL](https://phel-lang.org/documentation/repl/) (starts with `vendor/bin/phel repl`), the WordPress context can be loaded by running `(php/require_once "../../../wp-load.php")`.
+### Instantiating WordPress with `wp-load.php` in REPL
 
-If developing a plugin using this skeleton project that is activated and gets loaded during WordPress initialization (eg. via `wp-load.php`), the REPL environment might be messed up at that point with utilities like `use` and `doc` becoming unavailable ([see issue](https://github.com/phel-lang/phel-lang/issues/766)).
+WordPress runs `wp-load.php` in beginning of each HTTP request instantiating WP Core and user plugin code, after which regular WP PHP API functions including the [plugin API](https://developer.wordpress.org/reference/) will be available.
+
+On a REPL session it needs to be manually loaded with `(php/require_once "../../../wp-load.php")`. Please let us know if you know a nicer way to refer the file as relative path is prone to failure in many situations, eg. custom WordPress project file structure like [Roots.io Bedrock](https://roots.io/bedrock/), custom container volume setup or maybe even Windows.
+
+However when running `wp-load.php` in Phel REPL the loading of Phel plugin code itself during the WordPress initialization process needs to be considered which currently has some issues.
+
+The REPL environment may get messed up with utilities like `use` and `doc` becoming unavailable ([see issue](https://github.com/phel-lang/phel-lang/issues/766)).
 
 To avoid this, some REPL session aware conditional loading in plugin code is required, by eg. patching `phel-wp-plugin.php` to avoid running `Phel::run` during REPL session the following way:
 
@@ -70,10 +86,19 @@ if (isset($PHP_SELF) && $PHP_SELF !== "./vendor/bin/phel"){
 	print("Running REPL, skip running plugin Phel::run \n");
 }
 ```
+### Requiring code
 
-# Used workarounds
+When evaluating Phel files during interactive development session, evaluating the regular `ns` forms may need to be avoided and Phel REPL specific functions `use` and `require` should be used instead. 
+
+Improvement ideas in workflow regarding to this are welcome. Issues regarding to general Phel REPL experience can be raised in [phel-lang](https://github.com/phel-lang/phel-lang/issues) repository.
+
+# Editor support
+
+Refer to [Phel documentation on Editor support](https://phel-lang.org/documentation/getting-started/#editor-support). Some discussion also about Emacs integration with Phel REPL https://github.com/phel-lang/phel-lang/discussions/762.
+
+# Required workarounds
 
 ## `phel-config.php`
 
 - XDebug's (included with VVV) infinite loop detection gives false positive on default setting and requires `ini_set('xdebug.max_nesting_level', 300);`
-- Compatibility between with Phel and WordPress error logging facilities is work-in-progress. Currently error log file path is set into plugin dir with `->setErrorLogFile($projectRootDir . 'error.log')`, but this should be changed for production.
+- Plugin Phel error log file path is set into plugin dir with `->setErrorLogFile($projectRootDir . 'error.log')`, but this should be changed for production.
