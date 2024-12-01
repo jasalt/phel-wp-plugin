@@ -50,6 +50,14 @@ Container runs Apache web server as non-root user (UID 1001) which cannot write 
 
 On a single user laptop used for developing `sudo chmod -R 777 phel-wp-plugin` is probably enough, but more narrow permission for the container user UID would be better for security on multi-user system.
 
+### Managing container as root user
+
+Login as root user into the container to manage packages or do other other actions default user is prohibited from doing:
+```
+docker compose exec -uroot wordpress bash
+install_packages vim  # install vim using container's apt wrapper 
+```
+
 # REPL usage
 [Phel REPL](https://phel-lang.org/documentation/repl/) starts with `vendor/bin/phel repl` command. Quick way to connect to into running development container:
 ```
