@@ -80,12 +80,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/gacela-project/gacela.git",
-                "reference": "7210a8866d843c35ec17c7d9bdde7900d9ee4d48"
+                "reference": "a042a1bdeb481511c924ad525a16a563e846e9bc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/gacela-project/gacela/zipball/7210a8866d843c35ec17c7d9bdde7900d9ee4d48",
-                "reference": "7210a8866d843c35ec17c7d9bdde7900d9ee4d48",
+                "url": "https://api.github.com/repos/gacela-project/gacela/zipball/a042a1bdeb481511c924ad525a16a563e846e9bc",
+                "reference": "a042a1bdeb481511c924ad525a16a563e846e9bc",
                 "shasum": ""
             },
             "require": {
@@ -156,7 +156,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2024-12-01T11:07:40+00:00"
+            "time": "2024-12-01T11:46:31+00:00"
         },
         {
             "name": "phel-lang/phel-lang",
@@ -164,12 +164,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phel-lang/phel-lang.git",
-                "reference": "448119aee08a1606abe16d83fb4bba163a8c88ce"
+                "reference": "4002bec8e8a612545f4338d504ad25509c4a6310"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phel-lang/phel-lang/zipball/448119aee08a1606abe16d83fb4bba163a8c88ce",
-                "reference": "448119aee08a1606abe16d83fb4bba163a8c88ce",
+                "url": "https://api.github.com/repos/phel-lang/phel-lang/zipball/4002bec8e8a612545f4338d504ad25509c4a6310",
+                "reference": "4002bec8e8a612545f4338d504ad25509c4a6310",
                 "shasum": ""
             },
             "require": {
@@ -233,7 +233,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2024-12-01T11:19:48+00:00"
+            "time": "2024-12-01T12:00:18+00:00"
         },
         {
             "name": "phpunit/php-timer",
