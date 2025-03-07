@@ -1,8 +1,10 @@
-Experimental WordPress plugin skeleton made with [Phel](https://phel-lang.org/). Adds admin widget, interfaces a little bit with WordPress database and outputs some html using Phel html library.
+WordPress plugin skeleton made with [Phel](https://phel-lang.org/) lisp. Adds admin widget that interfaces with WordPress database and renders view using [hiccup](https://github.com/weavejester/hiccup) style [Phel HTML library](https://phel-lang.org/documentation/html-rendering/).
 
 ![Image of WordPress 6.6.1 Admin Dashboard with this plugin installed](demo.png "WordPress 6.6.1 Admin Dashboard with this plugin installed")
 
-Please note that this project is in experimental state, doesn't come with any warranties and might lead to dangerous security issues if used in production without sufficient care taken.
+It works for large part and there's some production code running in closed beta tests but more in depth documentation is in progress. Follow / raise issues for incomplete stuff or feel free to ask questions in Discussions section. 
+
+See also [wp.phel](https://gist.github.com/jasalt/900435efa20aade0f6b1b31fce779b23) for some extra wrapping around WP API's (work in progress library).
 
 # Installation
 
