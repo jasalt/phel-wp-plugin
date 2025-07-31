@@ -8,7 +8,7 @@ See also [wp.phel](https://gist.github.com/jasalt/900435efa20aade0f6b1b31fce779b
 
 # Installation
 
-Phel requires minimum PHP version 8.2 and Composer. Composer is not required if `vendor` directory is included with the plugin distribution.
+Phel requires minimum PHP version 8.3 and Composer. Composer is not required if `vendor` directory is included with the plugin distribution.
 
 ## Existing WordPress instance
 
