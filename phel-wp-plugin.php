@@ -9,7 +9,13 @@ Author URI: https://codeberg.org/jasalt
 
 // Dismiss notice
 // PHP Notice:  tempnam(): file created in the system's temporary directory
-error_reporting(E_ALL & ~E_NOTICE);
+set_error_handler(function($errno, $errstr, $errfile, $errline) {
+	if (strpos($errstr, 'tempnam(): file created') !== false) {
+		return true;
+	}
+	return false;
+}, E_USER_NOTICE | E_NOTICE);
+
 
 use Phel\Phel;
 
