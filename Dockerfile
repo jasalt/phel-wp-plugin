@@ -3,7 +3,7 @@
 # - https://github.com/docker-library/php/blob/master/8.3/bookworm/apache/Dockerfile
 # - https://github.com/docker-library/wordpress/blob/master/latest/php8.3/apache/Dockerfile
 
-FROM wordpress:latest
+FROM wordpress:php8.3
 
 
 # General dependencies & utilities
