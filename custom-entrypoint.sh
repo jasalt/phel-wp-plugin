@@ -33,7 +33,7 @@ else
 
 	if [ ! -d "/tmp/phel" ]; then
 	    mkdir /tmp/phel
-	    chmod -R 777 /tmp/phel
+	    chown -R www-data:www-data /tmp/phel
 	fi
 
 	cd /var/www/html/wp-content/plugins/phel-wp-plugin
