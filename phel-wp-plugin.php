@@ -2,8 +2,8 @@
 /*
 Plugin Name: Phel Demo Plugin
 Description: Adds admin widget printing some content with Phel
-Version: 0.1
-Author: Jarkko Saltiola
+Version: 0.2
+Author: Jarkko Saltiola & contributors
 Author URI: https://codeberg.org/jasalt
 */
 
