@@ -1,10 +1,12 @@
-WordPress plugin skeleton made with [Phel](https://phel-lang.org/) lisp. Adds admin widget that interfaces with WordPress database and renders view using [hiccup](https://github.com/weavejester/hiccup) style [Phel HTML library](https://phel-lang.org/documentation/html-rendering/).
+WordPress plugin skeleton made with [Phel](https://phel-lang.org/), a functional language inspired by Clojure and Janet.
+
+Adds admin widget that interfaces with WordPress database and renders view using [hiccup](https://github.com/weavejester/hiccup) style [Phel HTML library](https://phel-lang.org/documentation/html-rendering/).
 
 ![Image of WordPress 6.6.1 Admin Dashboard with this plugin installed](demo.png "WordPress 6.6.1 Admin Dashboard with this plugin installed")
 
-It works for large part and there's some production code running in closed beta tests but more in depth documentation is in progress. Follow / raise issues for incomplete stuff or feel free to ask questions in Discussions section. 
+It works for large part and there's production code using it but more in depth documentation is in progress. Follow / raise issues for incomplete stuff and feel free to ask questions about it.
 
-See also [wp.phel](https://gist.github.com/jasalt/900435efa20aade0f6b1b31fce779b23) for some extra wrapping around WP API's (work in progress library).
+See also [wp.phel](https://gist.github.com/jasalt/900435efa20aade0f6b1b31fce779b23) for some extra wrapping around WP API's (work in progress library) and [woocommerce-memberships-migrator](https://github.com/jasalt/woocommerce-memberships-migrator) as a example project.
 
 # Installation
 
@@ -20,21 +22,21 @@ Generally plugin can be installed as follows on a live WordPress site or on deve
 
 ## Development container
 
-For quick and simple local dev installation `docker-compose.yml` file is included and `Dockerfile` using official WordPress Bookworkm image with WP-CLI and XDebug added. This can be especially useful also for providing re-producible bug reports.
+For Docker (or Podman) `docker-compose.yml` file is included and `Dockerfile` using official WordPress Bookworm image with WP-CLI and XDebug added. This can be useful also for providing re-producible bug reports.
 
 ```
 git clone git@github.com:jasalt/phel-wp-plugin.git
-# sudo chmod -R 777 phel-wp-plugin  # probably required on Linux
+# sudo chmod -R 777 phel-wp-plugin  # maybe required with Podman
 cd phel-wp-plugin
 docker compose up  # or podman-compose up
 ```
 
-Following success message, access WP admin via http://localhost:8081/wp-admin with credentials user: "admin" password: "password". Try edit `src/main.phel` and see changes after page refresh etc.
+Following success message, access WP admin via http://localhost:8080/wp-admin with credentials user: "admin" password: "password". Try edit `src/main.phel` and see changes after page refresh etc.
 
 Additionally you can run Phel command line commands, including REPL eg. the following way:
 
 ```
-docker compose exec -w /var/www/html/wp-content/plugins/phel-wp-plugin wordpress bash
+docker compose exec -w /var/www/html/wp-content/plugins/phel-wp-plugin wp bash
 ./vendor/bin/phel --help
 ./vendor/bin/phel --version
 ./vendor/bin/phel repl
@@ -42,9 +44,9 @@ docker compose exec -w /var/www/html/wp-content/plugins/phel-wp-plugin wordpress
 (php/get_bloginfo "name")
 ```
 
-Note that to include your own namespaces declared in the plugin directory with `require`, the shell working directory should be set to plugin root directory before starting REPL. Also with the current container setup, referring to WP Core is more reliable via absolute path.
+Note that to include your own namespaces declared in the plugin directory with `require`, the shell working directory should be set to plugin root directory before starting REPL.
 
-Custom initialization scripts can be added to `docker-post-init-scripts` directory which get executed after container is created for tailored experience.
+Container initialization can be modified via `custom-entrypoint.sh`.
 
 ### Write permissions with volume mount
 
@@ -63,7 +65,7 @@ install_packages vim  # install vim using container's apt wrapper
 # REPL usage
 [Phel REPL](https://phel-lang.org/documentation/repl/) starts with `vendor/bin/phel repl` command. Quick way to connect to into running development container:
 ```
-docker compose exec -w /var/www/html/wp-content/plugins/phel-wp-plugin wordpress vendor/bin/phel repl
+docker compose exec -w /var/www/html/wp-content/plugins/phel-wp-plugin wp vendor/bin/phel repl
 ```
 Interfacing with the REPL works mostly as expected, examples:
 ```
@@ -112,5 +114,3 @@ Refer to [Phel documentation on Editor support](https://phel-lang.org/documentat
 
 - XDebug's (included with VVV) infinite loop detection gives false positive on default setting and requires `ini_set('xdebug.max_nesting_level', 300);`
 - Plugin Phel error log file path is set into plugin dir with `->setErrorLogFile($projectRootDir . 'error.log')`, but this should be changed for production.
-
-# TODO Image migration
