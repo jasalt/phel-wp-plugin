@@ -13,4 +13,5 @@ return (new PhelConfig())
     ->setIgnoreWhenBuilding(['src/local.phel'])
     ->setNoCacheWhenBuilding([])
     ->setKeepGeneratedTempFiles(false)
+	->setTempDir(sys_get_temp_dir().'/phel')
     ->setFormatDirs(['src', 'tests']);

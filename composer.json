@@ -11,12 +11,12 @@
   ],
   "authors": [
     {
-      "name": "Jarkko Saltiola"
+      "name": "Jarkko Saltiola & contributors"
     }
   ],
   "require": {
     "php": ">=8.3",
-    "phel-lang/phel-lang": "dev-main as 0.19.0"
+    "phel-lang/phel-lang": "0.19.1"
   },
   "minimum-stability": "dev",
   "config": {

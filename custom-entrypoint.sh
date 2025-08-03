@@ -31,11 +31,6 @@ if [ -f "/COMPOSE_INITIALIZED" ]; then
 else
 	echo "Running custom-entrypoint.sh initialization"
 
-	if [ ! -d "/tmp/phel" ]; then
-	    mkdir /tmp/phel
-	    chown -R www-data:www-data /tmp/phel
-	fi
-
 	cd /var/www/html/wp-content/plugins/phel-wp-plugin
 	composer install
 
