@@ -2,6 +2,8 @@ WordPress plugin skeleton made with [Phel](https://phel-lang.org/), a functional
 
 Adds admin widget that interfaces with WordPress database and renders view using [hiccup](https://github.com/weavejester/hiccup) style [Phel HTML library](https://phel-lang.org/documentation/html-rendering/).
 
+Additionally registers `wp phel` WP-CLI command for running Phel code in `src/cli.phel`.
+
 ![Image of WordPress 6.6.1 Admin Dashboard with this plugin installed](demo.png "WordPress 6.6.1 Admin Dashboard with this plugin installed")
 
 It works for large part and there's production code using it but more in depth documentation is in progress. Follow / raise issues for incomplete stuff and feel free to ask questions about it.
@@ -36,6 +38,10 @@ Following success message, access WP admin via http://localhost:8080/wp-admin wi
 Additionally you can run Phel command line commands, including REPL eg. the following way:
 
 ```
+# WP-CLI command
+docker compose exec wp wp --allow-root phel
+
+# Phel REPL
 docker compose exec -w /var/www/html/wp-content/plugins/phel-wp-plugin wp bash
 ./vendor/bin/phel --help
 ./vendor/bin/phel --version
