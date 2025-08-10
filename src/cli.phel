@@ -1,0 +1,5 @@
+(ns phel-wp-plugin\cli)
+
+(println "Phel running as WP-CLI command.")
+(println "Supplied args:" (php->phel argv))
+(println "You have" (php/-> (php/wp_count_posts) publish) "posts in the database.")
