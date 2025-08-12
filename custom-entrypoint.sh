@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -Eeou pipefail
 
+PLUGIN_NAME=phel-wp-plugin
+
 # Wrapper around original entrypoint appending extra initialization logic before
 # starting the web server
 
@@ -50,7 +52,7 @@ if [ -f "/COMPOSE_INITIALIZED" ]; then
 else
 	echo "Running custom-entrypoint.sh initialization"
 
-	cd /var/www/html/wp-content/plugins/phel-wp-plugin
+	cd /var/www/html/wp-content/plugins/$PLUGIN_NAME
 	composer install
 
 	cd /var/www/html/
@@ -67,7 +69,7 @@ else
 	# Not necessary but added so Apache doesn't make noise on startup
 	echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
-	wp plugin activate phel-wp-plugin --allow-root
+	wp plugin activate $PLUGIN_NAME --allow-root
 
 	wp post create --post_status=publish --allow-root \
 	   --post_title='Demo post' --post_content='
