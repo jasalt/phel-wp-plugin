@@ -1,11 +1,11 @@
 <?php
 /*
-Plugin Name: Phel Demo Plugin
-Description: Adds admin widget printing some content with Phel
-Version: 0.2
-Author: Jarkko Saltiola & contributors
-Author URI: https://codeberg.org/jasalt
-*/
+ * Plugin Name: Phel Demo Plugin
+ * Description: Adds admin widget printing some content with Phel
+ * Version: 0.2
+ * Author: Jarkko Saltiola & contributors
+ * Author URI: https://codeberg.org/jasalt
+ */
 
 use Phel\Phel;
 
@@ -22,7 +22,7 @@ if (isset($PHP_SELF) && $PHP_SELF !== "./vendor/bin/phel"){
 	// Don't re-initialize Phel or run main namespace outside regular web request
 	// context e.g. when starting REPL session or running as WP-CLI command.
 
-        // Debug print disabled as it leads to error message on plugin activation
+	// Debug print disabled as it leads to error message on plugin activation
 	// print("Skip running phel-wp-plugin\main outside web request context.\n");
 }
 
