@@ -8,8 +8,8 @@ services:
       MYSQL_DATABASE: wordpress
       MYSQL_USER: wordpress
       MYSQL_PASSWORD: wordpress
-    ports:
-      - 3306:3306
+    # ports:  # expose database ports to host if needed
+    #   - 3306:3306
     restart: unless-stopped
   wp:
     build: .
