@@ -72,6 +72,11 @@ else
 
 	wp plugin activate $PLUGIN_NAME --allow-root
 
+	# Change permalink settings from default value which often leads to various
+	# issues.
+	wp --allow-root option update permalink_structure '/%postname%/'
+	wp --allow-root rewrite flush
+
 	wp post create --post_status=publish --allow-root \
 	   --post_title='Demo post' --post_content='
          <!-- wp:paragraph -->
