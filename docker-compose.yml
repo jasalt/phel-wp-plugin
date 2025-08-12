@@ -15,7 +15,7 @@ services:
     build: .
     entrypoint: /custom-entrypoint.sh
     ports:
-      - "8080:80"  # modify post-init.sh if changing port
+      - "8080:80"
     depends_on:
       - db
     restart: always
