@@ -2,6 +2,7 @@
 set -Eeou pipefail
 
 PLUGIN_NAME=phel-wp-plugin
+SITE_URL=localhost:8080
 
 # Wrapper around original entrypoint appending extra initialization logic before
 # starting the web server
@@ -14,7 +15,7 @@ echo_startup_banner() {
     echo " |   |  |/|_/|_/     \/ \/    |       |   |_/ \/|_/\/|/|/ | |_/"
     echo "                                                    (|"
     echo ""
-	echo "Login to the site at http://localhost:8080/wp-admin/"
+	echo "Login to the site at http://$SITE_URL/wp-admin/"
 	echo ""
 	echo "Username: admin"
 	echo "Password: password"
@@ -62,7 +63,7 @@ else
 
 	echo "Setting up WP installation with demo credentials"
 
-	wp core install --allow-root --url=localhost:8080 \
+	wp core install --allow-root --url=$SITE_URL \
 	   --title="Phel WP Plugin Demo Site" --admin_user=admin \
 	   --admin_password=password --admin_email=example@example.com
 
@@ -75,7 +76,7 @@ else
 	   --post_title='Demo post' --post_content='
          <!-- wp:paragraph -->
            <p>Hello world.
-             <a href="http://localhost:8080/wp-admin/post.php?post=4&amp;action=edit">Login &amp; edit</a>
+             <a href="http://'$SITE_URL'/wp-admin/post.php?post=4&amp;action=edit">Login &amp; edit</a>
            </p>
          <!-- /wp:paragraph -->'
 
