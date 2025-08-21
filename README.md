@@ -35,13 +35,13 @@ docker compose up  # or podman-compose up
 
 Following success message, access WP admin via http://localhost:8080/wp-admin with credentials user: "admin" password: "password". Try edit `src/main.phel` and see changes after page refresh etc.
 
-Additionally you can run Phel command line commands, including REPL eg. the following way:
+Additionally you can run Phel command line commands, including the REPL as follows:
 
 ```
-# WP-CLI command
-docker compose exec wp wp --allow-root phel
+# Run WP-CLI command
+docker compose exec wp wp --allow-root my-phel-command
 
-# Phel REPL
+# Run Phel REPL
 docker compose exec -w /var/www/html/wp-content/plugins/phel-wp-plugin wp bash
 ./vendor/bin/phel --help
 ./vendor/bin/phel --version
@@ -53,20 +53,6 @@ docker compose exec -w /var/www/html/wp-content/plugins/phel-wp-plugin wp bash
 Note that to include your own namespaces declared in the plugin directory with `require`, the shell working directory should be set to plugin root directory before starting REPL.
 
 Container initialization can be modified via `custom-entrypoint.sh`.
-
-### Write permissions with volume mount
-
-Container runs Apache web server as non-root user (UID 1001) which cannot write to the mounted volume (this folder) for installing Composer dependencies, writing Phel logs, temp files etc. and may lead to permission errors.
-
-On a single user laptop used for developing `sudo chmod -R 777 phel-wp-plugin` is probably enough, but more narrow permission for the container user UID would be better for security on multi-user system.
-
-### Managing container as root user
-
-Login as root user into the container to manage packages or do other other actions default user is prohibited from doing:
-```
-docker compose exec -uroot wordpress bash
-install_packages vim  # install vim using container's apt wrapper 
-```
 
 # REPL usage
 [Phel REPL](https://phel-lang.org/documentation/repl/) starts with `vendor/bin/phel repl` command. Quick way to connect to into running development container:
@@ -104,11 +90,18 @@ if (isset($PHP_SELF) && $PHP_SELF !== "./vendor/bin/phel"){
 	print("Running REPL, skip running plugin Phel::run \n");
 }
 ```
-### Requiring code
 
-When evaluating Phel files during interactive development session, evaluating the regular `ns` forms may need to be avoided and Phel REPL specific functions `use` and `require` should be used instead. 
+### Scheduling tasks with system cron & WP-CLI
 
-Improvement ideas in workflow regarding to this are welcome. Issues regarding to general Phel REPL experience can be raised in [phel-lang](https://github.com/phel-lang/phel-lang/issues) repository.
+Registered WP-CLI commands can be scheduled with system cron in straightforward fashion, to run command every 15 minutes, issue `crontab -e` and add following:
+
+```
+*/15 * * * * /usr/local/bin/wp my-phel-command >> /home/user/logs/my-phel-command.log 2>&1
+```
+
+Example redirects both stdout and stderr to a log file and path to it should exist and be writable.
+
+If the command is not getting triggered correctly, make sure you have WP-CLI correctly installed. If WP installation does not get resolved correctly the can be configured with `--path=/path/to/wp-installation` or by doing `cd /path/to/wp-installation && <the-rest-of-the command>`.
 
 # Editor support
 
@@ -120,3 +113,20 @@ Refer to [Phel documentation on Editor support](https://phel-lang.org/documentat
 
 - XDebug's (included with VVV) infinite loop detection gives false positive on default setting and requires `ini_set('xdebug.max_nesting_level', 300);`
 - Plugin Phel error log file path is set into plugin dir with `->setErrorLogFile($projectRootDir . 'error.log')`, but this should be changed for production.
+
+# Troubleshooting
+
+
+## Write permissions with volume mount
+
+Container runs Apache web server as non-root user (UID 1001) which cannot write to the mounted volume (this folder) for installing Composer dependencies, writing Phel logs, temp files etc. and may lead to permission errors.
+
+On a single user laptop used for developing `sudo chmod -R 777 phel-wp-plugin` is probably enough, but more narrow permission for the container user UID would be better for security on multi-user system.
+
+## Managing container as root user
+
+Login as root user into the container to manage packages or do other other actions default user is prohibited from doing:
+```
+docker compose exec -uroot wordpress bash
+install_packages vim  # install vim using container's apt wrapper 
+```

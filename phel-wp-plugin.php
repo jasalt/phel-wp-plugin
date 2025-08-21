@@ -31,7 +31,7 @@ if (isset($PHP_SELF) && $PHP_SELF !== "./vendor/bin/phel"){
  * https://make.wordpress.org/cli/handbook/guides/commands-cookbook/
  */
 if ( class_exists( 'WP_CLI' ) ) {
-	WP_CLI::add_command( 'phel',
+	WP_CLI::add_command( 'my-phel-command',
 						 function ( $args ){
 							 $projectRootDir = __DIR__ . '/';
 							 require $projectRootDir . 'vendor/autoload.php';
