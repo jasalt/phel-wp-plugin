@@ -3,14 +3,14 @@
 # - https://github.com/docker-library/php/blob/master/8.3/bookworm/apache/Dockerfile
 # - https://github.com/docker-library/wordpress/blob/master/latest/php8.3/apache/Dockerfile
 
-FROM wordpress:php8.3
+FROM docker.io/wordpress:php8.3
 
 
 # General dependencies & utilities
 # NOTE: vim-tiny does not support syntax highlighting
 
 RUN apt-get update && \
-	apt-get install -y less vim-tiny
+	apt-get install -y less vim-tiny git rsync btop
 	# && rm -rf /var/lib/apt/lists/* # clears package index to free space
 
 
