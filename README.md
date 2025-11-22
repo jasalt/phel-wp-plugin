@@ -1,42 +1,41 @@
-WordPress plugin skeleton made with [Phel](https://phel-lang.org/), a functional language inspired by Clojure and Janet.
+WordPress plugin skeleton made with [Phel](https://phel-lang.org/), a functional language inspired by Clojure and Janet that transpiles to PHP.
 
-Adds admin widget that interfaces with WordPress database and renders view using [hiccup](https://github.com/weavejester/hiccup) style [Phel HTML library](https://phel-lang.org/documentation/html-rendering/).
+Demonstrates a basic admin widget interfacing with the database rendered using [hiccup](https://github.com/weavejester/hiccup) style [Phel HTML library](https://phel-lang.org/documentation/html-rendering/).
 
 ![Image of WordPress 6.6.1 Admin Dashboard with this plugin installed](demo.png "WordPress 6.6.1 Admin Dashboard with this plugin installed")
 
-It works for large part and there's production code using it but more in depth documentation is in progress. Follow / raise issues for incomplete stuff and feel free to ask questions about it.
-
-See also [wp.phel](https://gist.github.com/jasalt/900435efa20aade0f6b1b31fce779b23) for some extra wrapping around WP API's (work in progress library) and [woocommerce-memberships-migrator](https://github.com/jasalt/woocommerce-memberships-migrator) as a example project.
+See also [wp.phel](https://github.com/jasalt/phel-junkshed/blob/master/wp.phel) for some wrapper functions over WP API's and [woocommerce-memberships-migrator](https://github.com/jasalt/woocommerce-memberships-migrator) as a example project (a WP-CLI utility).
 
 # Installation
 
-Phel requires minimum PHP version 8.3 and Composer is required for installing it. Composer is not required if `vendor` directory is included with the plugin distribution. Note that Composer autoloader does not play very well with WP plugins out-of-box and something like [PHP-Scoper](https://github.com/humbug/php-scoper/) or [Strauss](https://github.com/BrianHenryIE/strauss) is probably required for plugin distribution (see also https://github.com/jasalt/phel-wp-plugin/issues/9).
+Phel requires minimum PHP version 8.3 and Composer for installing it, refer to [Phel quick start](https://phel-lang.org/documentation/getting-started/).
 
 ## Existing WordPress instance
 
-Generally plugin can be installed as follows on a live WordPress site or on development server such as [VVV Vagrant](https://varyingvagrantvagrants.org/) or [LocalWP](https://localwp.com/):
-
 1) Clone this repository into existing WP installation path `wp-content/plugins/phel-wp-plugin`.
 2) Install Composer dependencies with `cd phel-wp-plugin && composer install`.
-3) Activate plugin on plugin management page or with `wp plugin activate phel-wp-plugin` and open Admin Dashboard (`/wp-admin`) where this widget should be visible.
+3) Activate plugin on plugin management page or with `wp plugin activate phel-wp-plugin` 
 
-## Development container
+The widget should be visible on admin dashboard. Try editing `src/main.phel` and see changes after page refresh etc.
 
-For Docker (or Podman) `docker-compose.yml` file is included and `Dockerfile` using official WordPress Bookworm image with WP-CLI and XDebug added. This can be useful also for providing re-producible bug reports.
+## Container
+
+For Podman (or Docker) users, a pre-configured `docker-compose.yml` is included. The `Dockerfile` is based on official WordPress image adding Composer, WP-CLI, XDebug and some other tools to it and `custom-entrypoint.sh` installs WP and the plugin on first run.
 
 ```
 git clone git@github.com:jasalt/phel-wp-plugin.git
-# sudo chmod -R 777 phel-wp-plugin  # maybe required with Podman
 cd phel-wp-plugin
-docker compose up  # or podman-compose up
+podman compose up  # or docker compose up
 ```
 
-Following success message, access WP admin via http://localhost:8080/wp-admin with credentials user: "admin" password: "password". Try edit `src/main.phel` and see changes after page refresh etc.
+Following success message, access WP admin via http://localhost:8080/wp-admin with credentials user: "admin" password: "password".
+
+While `podman` is supported primarily, replacing it with `docker` in command examples should work also.
 
 Additionally you can run Phel command line commands, including REPL eg. the following way:
 
 ```
-docker compose exec -w /var/www/html/wp-content/plugins/phel-wp-plugin wp bash
+podman compose exec -w /var/www/html/wp-content/plugins/phel-wp-plugin wp bash
 ./vendor/bin/phel --help
 ./vendor/bin/phel --version
 ./vendor/bin/phel repl
@@ -46,26 +45,10 @@ docker compose exec -w /var/www/html/wp-content/plugins/phel-wp-plugin wp bash
 
 Note that to include your own namespaces declared in the plugin directory with `require`, the shell working directory should be set to plugin root directory before starting REPL.
 
-Container initialization can be modified via `custom-entrypoint.sh`.
-
-### Write permissions with volume mount
-
-Container runs Apache web server as non-root user (UID 1001) which cannot write to the mounted volume (this folder) for installing Composer dependencies, writing Phel logs, temp files etc. and may lead to permission errors.
-
-On a single user laptop used for developing `sudo chmod -R 777 phel-wp-plugin` is probably enough, but more narrow permission for the container user UID would be better for security on multi-user system.
-
-### Managing container as root user
-
-Login as root user into the container to manage packages or do other other actions default user is prohibited from doing:
-```
-docker compose exec -uroot wordpress bash
-install_packages vim  # install vim using container's apt wrapper 
-```
-
 # REPL usage
 [Phel REPL](https://phel-lang.org/documentation/repl/) starts with `vendor/bin/phel repl` command. Quick way to connect to into running development container:
 ```
-docker compose exec -w /var/www/html/wp-content/plugins/phel-wp-plugin wp vendor/bin/phel repl
+podman compose exec -w /var/www/html/wp-content/plugins/phel-wp-plugin wp vendor/bin/phel repl
 ```
 Interfacing with the REPL works mostly as expected, examples:
 ```
@@ -114,3 +97,7 @@ Refer to [Phel documentation on Editor support](https://phel-lang.org/documentat
 
 - XDebug's (included with VVV) infinite loop detection gives false positive on default setting and requires `ini_set('xdebug.max_nesting_level', 300);`
 - Plugin Phel error log file path is set into plugin dir with `->setErrorLogFile($projectRootDir . 'error.log')`, but this should be changed for production.
+
+# Packaging notes
+
+Composer is not required if `vendor` directory is included with the plugin distribution. Note that Composer autoloader does not play very well with WP plugins out-of-box and something like [PHP-Scoper](https://github.com/humbug/php-scoper/) or [Strauss](https://github.com/BrianHenryIE/strauss) is probably required for plugin distribution (see also https://github.com/jasalt/phel-wp-plugin/issues/9).
