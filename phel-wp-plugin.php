@@ -27,9 +27,12 @@ if (isset($PHP_SELF) && $PHP_SELF !== "./vendor/bin/phel"){
  * Register WP-CLI command 'wp phel' running Phel namespace at `src/cli.phel`
  * https://make.wordpress.org/cli/handbook/guides/commands-cookbook/
  */
-WP_CLI::add_command( 'phel',
-					 function ( $args ){
-						 $projectRootDir = __DIR__ . '/';
-						 Phel::run($projectRootDir, 'phel-wp-plugin\cli');
-						 WP_CLI::success( "done!" );
-					 }, ['shortdesc' => 'Runs Phel code as WP-CLI command']);
+
+// TODO fix & re-enable for podman
+
+// WP_CLI::add_command( 'phel',
+// 					 function ( $args ){
+// 						 $projectRootDir = __DIR__ . '/';
+// 						 Phel::run($projectRootDir, 'phel-wp-plugin\cli');
+// 						 WP_CLI::success( "done!" );
+// 					 }, ['shortdesc' => 'Runs Phel code as WP-CLI command']);
