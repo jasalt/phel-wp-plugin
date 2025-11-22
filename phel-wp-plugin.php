@@ -20,7 +20,6 @@ if (isset($PHP_SELF) && $PHP_SELF !== "./vendor/bin/phel"){
 } else {
 	// Don't re-initialize Phel or run main namespace outside regular web request
 	// context e.g. when starting REPL session or running as WP-CLI command.
-	print("Skip running phel-wp-plugin\main outside web request context.\n");
 }
 
 
