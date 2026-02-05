@@ -20,36 +20,26 @@ The widget should be visible on admin dashboard. Try editing `src/main.phel` and
 
 ## Container
 
-For Podman (or Docker) users, a pre-configured `docker-compose.yml` is included. The `Dockerfile` is based on official WordPress image adding Composer, WP-CLI, XDebug and some other tools to it and `custom-entrypoint.sh` installs WP and the plugin on first run.
+A `docker-compose.yml` is included with custom `Dockerfile` that adds some extra tools to the official WordPress image (e.g. Composer, WP-CLI, XDebug). The `custom-entrypoint.sh` does the plugin setup on first run.
+
+Replace `podman` with `docker` in the commands if preferred.
 
 ```
 git clone git@github.com:jasalt/phel-wp-plugin.git
 cd phel-wp-plugin
-podman compose up  # or docker compose up
+podman compose up -d
 ```
 
 Following success message, access WP admin via http://localhost:8080/wp-admin with credentials user: "admin" password: "password".
 
-While `podman` is supported primarily, replacing it with `docker` in command examples should work also.
-
-Additionally you can run Phel command line commands, including REPL eg. the following way:
-
-```
-podman compose exec -w /var/www/html/wp-content/plugins/phel-wp-plugin wp bash
-./vendor/bin/phel --help
-./vendor/bin/phel --version
-./vendor/bin/phel repl
-(php/require_once "/var/www/html/wp-load.php")
-(php/get_bloginfo "name")
-```
-
-Note that to include your own namespaces declared in the plugin directory with `require`, the shell working directory should be set to plugin root directory before starting REPL.
+For [historical reasons](https://stackoverflow.com/a/32647166) the WordPress container running Apache may keep shutting down with `caught SIGWINCH, shutting down gracefully` if it's attached to terminal, so it's best to run it in the background with `-d` flag.
 
 # REPL usage
-[Phel REPL](https://phel-lang.org/documentation/repl/) starts with `vendor/bin/phel repl` command. Quick way to connect to into running development container:
+[Phel REPL](https://phel-lang.org/documentation/repl/) starts with `vendor/bin/phel` command. Quick way to connect to into running development container:
 ```
-podman compose exec -w /var/www/html/wp-content/plugins/phel-wp-plugin wp vendor/bin/phel repl
+podman compose exec -w /var/www/html/wp-content/plugins/phel-wp-plugin wp vendor/bin/phel
 ```
+
 Interfacing with the REPL works mostly as expected, examples:
 ```
 (php/require_once "../../../wp-load.php")  # instantiate WordPress
@@ -59,6 +49,8 @@ Interfacing with the REPL works mostly as expected, examples:
 (require phel-wp-plugin\my-other-ns :as my-other-ns)  # load a Phel source file from src/
 (use \Laminas\XmlRpc\Client)               # load installed Composer PHP libraries
 ```
+
+Note that to include your own namespaces declared in the plugin directory with `require`, the shell working directory should be set to plugin root directory before starting REPL.
 
 ### Instantiating WordPress with `wp-load.php` in REPL
 
