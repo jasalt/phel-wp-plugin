@@ -1,95 +1,90 @@
-WordPress plugin skeleton made with [Phel](https://phel-lang.org/), a functional language inspired by Clojure and Janet that transpiles to PHP.
+```
+, _                          , _     , _
+ /|/ \|     _ |\    (|  |  |_//|/ \   /|/ \|\        _, o
+  |__/|/\  |/ |/     |  |  |   |__/    |__/|/ |  |  / | | /|/|
+  |   |  |/|_/|_/     \/ \/    |       |   |_/ \/|_/\/|/|/ | |_/
+                                                     (|
+```
 
-Demonstrates a basic admin widget interfacing with the database rendered using [hiccup](https://github.com/weavejester/hiccup) style [Phel HTML library](https://phel-lang.org/documentation/html-rendering/).
+WordPress plugin skeleton for [Phel](https://phel-lang.org/), a functional programming language inspired by Clojure and Janet.
+
+Plugin sets up a simple admin widget querying the database and rendering HTML using [Phel HTML library](https://phel-lang.org/documentation/html-rendering/) in way familiar from Clojure [hiccup](https://github.com/weavejester/hiccup).
 
 ![Image of WordPress 6.6.1 Admin Dashboard with this plugin installed](demo.png "WordPress 6.6.1 Admin Dashboard with this plugin installed")
 
-See also [wp.phel](https://github.com/jasalt/phel-junkshed/blob/master/wp.phel) for some wrapper functions over WP API's and [woocommerce-memberships-migrator](https://github.com/jasalt/woocommerce-memberships-migrator) as a example project (a WP-CLI utility).
-
 # Installation
+## Development container
 
-Phel requires minimum PHP version 8.3 and Composer for installing it, refer to [Phel quick start](https://phel-lang.org/documentation/getting-started/).
+For quick testing, a `docker-compose.yml` is included with custom `Dockerfile` that adds some extra tools to the official WordPress image (e.g. Composer, WP-CLI, XDebug). The `custom-entrypoint.sh` sets up the plugin on first run.
 
-## Existing WordPress instance
-
-1) Clone this repository into existing WP installation path `wp-content/plugins/phel-wp-plugin`.
-2) Install Composer dependencies with `cd phel-wp-plugin && composer install`.
-3) Activate plugin on plugin management page or with `wp plugin activate phel-wp-plugin` 
-
-The widget should be visible on admin dashboard. Try editing `src/main.phel` and see changes after page refresh etc.
-
-## Container
-
-A `docker-compose.yml` is included with custom `Dockerfile` that adds some extra tools to the official WordPress image (e.g. Composer, WP-CLI, XDebug). The `custom-entrypoint.sh` does the plugin setup on first run.
-
-Replace `podman` with `docker` in the commands if preferred.
+Replace `podman` with `docker` in the commands if you prefer.
 
 ```
 git clone git@github.com:jasalt/phel-wp-plugin.git
 cd phel-wp-plugin
-podman compose up -d
+podman compose up
 ```
 
 Following success message, access WP admin via http://localhost:8080/wp-admin with credentials user: "admin" password: "password".
 
-For [historical reasons](https://stackoverflow.com/a/32647166) the WordPress container running Apache may keep shutting down with `caught SIGWINCH, shutting down gracefully` if it's attached to terminal, so it's best to run it in the background with `-d` flag.
+For [historical reasons](https://stackoverflow.com/a/32647166) the WordPress container running Apache may occasionally shut down with `caught SIGWINCH, shutting down gracefully` when it's attached to terminal. This can be avoided by running it in the background by using `podman compose up -d`.
+
+## Existing WordPress installation
+
+Requires PHP 8.3+ and Composer.
+
+1) Clone this repository into plugins directory of an existing WordPress installation e.g. `wp-content/plugins/phel-wp-plugin`.
+2) Install Composer dependencies `cd phel-wp-plugin && composer install`.
+3) Activate plugin on plugin management page or with WP-CLI `wp plugin activate phel-wp-plugin`.
+
+The widget should be visible on admin dashboard. Try editing `src/main.phel` and see changes after page refresh.
+
 
 # REPL usage
 [Phel REPL](https://phel-lang.org/documentation/repl/) starts with `vendor/bin/phel` command. Quick way to connect to into running development container:
-```
+```bash
 podman compose exec -w /var/www/html/wp-content/plugins/phel-wp-plugin wp vendor/bin/phel
 ```
 
 Interfacing with the REPL works mostly as expected, examples:
-```
-(php/require_once "../../../wp-load.php")  # instantiate WordPress
-(get php/$GLOBALS "wpdb")                  # refer to wpdb for database operations
+```clojure
+(php/require_once "../../../wp-load.php")  ; instantiate WordPress
+(get php/$GLOBALS "wpdb")                  ; refer to wpdb for database operations
 
-(require phel\html :refer [html])          # load Phel core libraries
+(require phel\html :refer [html])          ; load Phel core libraries
 (require phel-wp-plugin\my-other-ns :as my-other-ns)  # load a Phel source file from src/
-(use \Laminas\XmlRpc\Client)               # load installed Composer PHP libraries
+(use \Laminas\XmlRpc\Client)               ; load installed Composer PHP libraries
 ```
 
-Note that to include your own namespaces declared in the plugin directory with `require`, the shell working directory should be set to plugin root directory before starting REPL.
-
-### Instantiating WordPress with `wp-load.php` in REPL
-
-WordPress runs `wp-load.php` in beginning of each HTTP request instantiating WP Core and user plugin code, after which regular WP PHP API functions including the [plugin API](https://developer.wordpress.org/reference/) will be available.
-
-On a REPL session it needs to be manually loaded with `(php/require_once "../../../wp-load.php")`. Please let us know if you know a nicer way to refer the file as relative path is prone to failure in many situations, eg. custom WordPress project file structure like [Roots.io Bedrock](https://roots.io/bedrock/), custom container volume setup or maybe even Windows.
-
-However when running `wp-load.php` in Phel REPL the loading of Phel plugin code itself during the WordPress initialization process needs to be considered which currently has some issues.
-
-The REPL environment may get messed up with utilities like `use` and `doc` becoming unavailable ([see issue](https://github.com/phel-lang/phel-lang/issues/766)).
-
-To avoid this, some REPL session aware conditional loading in plugin code is required, by eg. patching `phel-wp-plugin.php` to avoid running `Phel::run` during REPL session the following way:
-
-```
-// Skip initializing Phel again during REPL session
-if (isset($PHP_SELF) && $PHP_SELF !== "./vendor/bin/phel"){
-	Phel::run($projectRootDir, 'phel-wp-plugin\main');
-} else {
-	// This else is for debugging purposes and could be removed
-	print("Running REPL, skip running plugin Phel::run \n");
-}
-```
-### Requiring code
-
-When evaluating Phel files during interactive development session, evaluating the regular `ns` forms may need to be avoided and Phel REPL specific functions `use` and `require` should be used instead. 
-
-Improvement ideas in workflow regarding to this are welcome. Issues regarding to general Phel REPL experience can be raised in [phel-lang](https://github.com/phel-lang/phel-lang/issues) repository.
-
-# Editor support
-
-Refer to [Phel documentation on Editor support](https://phel-lang.org/documentation/getting-started/#editor-support). Some discussion also about Emacs integration with Phel REPL https://github.com/phel-lang/phel-lang/discussions/762.
-
-# Required workarounds
-
-## `phel-config.php`
-
-- XDebug's (included with VVV) infinite loop detection gives false positive on default setting and requires `ini_set('xdebug.max_nesting_level', 300);`
-- Plugin Phel error log file path is set into plugin dir with `->setErrorLogFile($projectRootDir . 'error.log')`, but this should be changed for production.
+Note that to include your own namespaces declared in the plugin directory with `require`, the shell working directory should be set to plugin root directory before starting the REPL.
 
 # Packaging notes
 
 Composer is not required if `vendor` directory is included with the plugin distribution. Note that Composer autoloader does not play very well with WP plugins out-of-box and something like [PHP-Scoper](https://github.com/humbug/php-scoper/) or [Strauss](https://github.com/BrianHenryIE/strauss) is probably required for plugin distribution (see also https://github.com/jasalt/phel-wp-plugin/issues/9).
+
+# Related projects
+
+See also [wp.phel](https://github.com/jasalt/phel-junkshed/blob/master/wp.phel) for some wrapper functions over WP API's and [woocommerce-memberships-migrator](https://github.com/jasalt/woocommerce-memberships-migrator) as a example project (a WP-CLI utility).
+
+# Advanced topics
+
+## `phel-config.php` recommendations
+
+- XDebug's (included with VVV) infinite loop detection gives false positive on default setting and requires `ini_set('xdebug.max_nesting_level', 300);`
+- Plugin Phel error log file path is set into plugin dir with `->setErrorLogFile($projectRootDir . 'error.log')`, but this should be changed for production.
+
+## Instantiating WordPress with `wp-load.php` from Phel
+
+WordPress runs `wp-load.php` in beginning of each HTTP request instantiating WordPress Core which loads user plugins including the `phel-wp-plugin.php` which bootstraps Phel by running `Phel::run`.
+
+From a standalone Phel REPL session or a script it can be loaded with `(php/require_once "wp-load.php")`, but this would lead to bootstrapping Phel the second time without some conditional checking in `phel-wp-plugin.php` e.g.
+
+```
+// Avoid bootstrapping Phel the second time from REPL session
+if (isset($PHP_SELF) && $PHP_SELF !== "./vendor/bin/phel"){
+	Phel::run($projectRootDir, 'phel-wp-plugin\main');
+} else {
+	// This debug print should be removed
+	print("Running REPL, skip running plugin Phel::run \n");
+}
+```
