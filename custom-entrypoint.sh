@@ -23,7 +23,7 @@ chmod +x /usr/local/bin/apache2-noop
 ### END HACK
 
 
-echo "CRunning extra tasks before starting apache..."
+echo "Running extra tasks before starting apache..."
 
 if [ -f "/COMPOSE_INITIALIZED" ]; then
 	echo "Found /COMPOSE_INITIALIZED"
@@ -76,7 +76,7 @@ else
 
 fi
 
-# Run server or given arguments like original entrypoint
+# Run server or given arguments like the original entrypoint
 if [ $# -eq 0 ]; then
     exec apache2-foreground
 else
