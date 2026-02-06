@@ -8,8 +8,10 @@ services:
       MYSQL_DATABASE: wordpress
       MYSQL_USER: wordpress
       MYSQL_PASSWORD: wordpress
-    ports:
-      - 3306:3306
+    # Uncomment to make DB accessible from host
+    # (remember to ensure firewall configuration to not expose publicly)
+    # ports:
+    #   - 3306:3306
     restart: unless-stopped
   wp:
     build: .

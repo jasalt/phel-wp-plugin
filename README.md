@@ -15,9 +15,11 @@ Plugin sets up a simple admin widget querying the database and rendering HTML us
 # Installation
 ## Development container
 
-For quick testing, a `docker-compose.yml` is included with custom `Dockerfile` that adds some extra tools to the official WordPress image (e.g. Composer, WP-CLI, XDebug). The `custom-entrypoint.sh` sets up the plugin on first run.
+For quick testing, a `docker-compose.yml` is included with custom `Dockerfile` that adds some extra tools to the official WordPress image (e.g. Composer, WP-CLI, XDebug). The `custom-entrypoint.sh` sets up the plugin on first run and creates an admin user.
 
-Replace `podman` with `docker` in the commands if you prefer.
+Ensure that the port 8080 is not being exposed to unsafe network from host as the default admin credentials are weak.
+
+Replace `podman` with `docker` in the commands if preferred.
 
 ```
 git clone git@github.com:jasalt/phel-wp-plugin.git
