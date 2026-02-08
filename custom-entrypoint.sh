@@ -34,12 +34,23 @@ else
 	cd /var/www/html/wp-content/plugins/phel-wp-plugin
 	composer install
 
-	cd /var/www/html/
+    echo "Waiting for MariaDB to accept connections..."
+    for i in {1..30}; do
+        if mysql -h"${WORDPRESS_DB_HOST}" -u"${WORDPRESS_DB_USER}" \
+                 -p"${WORDPRESS_DB_PASSWORD}" --connect-timeout=5 \
+                 -e "SELECT 1" 2>/dev/null;
+        then
+            echo "MariaDB connected successfully"
+            break
+        fi
+        [ $i -eq 30 ] && echo "MariaDB failed to become ready" && exit 1
+        sleep 1
+    done
 
-	echo "Waiting 10 seconds for MariaDB before installation"
-	sleep 10  # TODO more elegant ways?
 
 	echo "Setting up WP installation with demo credentials"
+
+	cd /var/www/html/
 
 	wp core install --allow-root --url=localhost:8080 \
 	   --title="Phel WP Plugin Demo Site" --admin_user=admin \
