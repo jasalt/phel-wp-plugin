@@ -1,15 +1,13 @@
 services:
   db:
-    image: lscr.io/linuxserver/mariadb:latest
+    image: docker.io/mariadb:lts-ubi
     environment:
-      PUID: 1000
-      PGID: 1000
+      # https://mariadb.com/docs/server/server-management/automated-mariadb-deployment-and-administration/docker-and-mariadb/mariadb-server-docker-official-image-environment-variables
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: wordpress
       MYSQL_USER: wordpress
       MYSQL_PASSWORD: wordpress
-    # Uncomment to make DB accessible from host
-    # (remember to ensure firewall configuration to not expose publicly)
+    # Uncomment to make DB accessible from host (please to secure it first)
     # ports:
     #   - 3306:3306
     restart: unless-stopped
