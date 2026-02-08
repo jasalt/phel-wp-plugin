@@ -19,17 +19,17 @@ For quick testing, a `docker-compose.yml` is included with custom `Dockerfile` t
 
 Ensure that the port 8080 is not being exposed to unsafe network from host as the default admin credentials are weak.
 
-Replace `podman` with `docker` in the commands if preferred.
+Replace `podman` with `docker` in the commands if preferred. Tested on Debian 13 using APT packages `podman`, `podman-compose`, `aardvark-dns`.
 
 ```
 git clone git@github.com:jasalt/phel-wp-plugin.git
 cd phel-wp-plugin
-podman compose up
+podman compose up -d && podman compose logs -f
 ```
 
-Following success message, access WP admin via http://localhost:8080/wp-admin with credentials user: "admin" password: "password".
+Following a success message, use the default credentials (`admin` / `password`) to access WordPress admin page http://localhost:8080/wp-admin.
 
-For [historical reasons](https://stackoverflow.com/a/32647166) the WordPress container running Apache may occasionally shut down with `caught SIGWINCH, shutting down gracefully` when it's attached to terminal. This can be avoided by running it in the background by using `podman compose up -d`.
+For [historical reasons](https://stackoverflow.com/a/32647166) the default WordPress container running Apache may occasionally shut down with `caught SIGWINCH, shutting down gracefully` when it's attached to terminal. This can be avoided by running it in the background by using `podman compose up -d`.
 
 ## Existing WordPress installation
 
