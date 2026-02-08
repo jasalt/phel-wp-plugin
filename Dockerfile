@@ -10,7 +10,7 @@ FROM docker.io/wordpress:php8.3
 # NOTE: vim-tiny does not support syntax highlighting
 
 RUN apt-get update && \
-	apt-get install -y less vim-tiny git rsync btop
+	apt-get install -y less vim-tiny git rsync btop dnsutils
 	# && rm -rf /var/lib/apt/lists/* # clears package index to free space
 
 
