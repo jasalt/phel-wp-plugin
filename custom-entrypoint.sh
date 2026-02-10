@@ -22,6 +22,12 @@ chmod +x /usr/local/bin/apache2-noop
 
 ### END HACK
 
+# Runs wp command under www-data user
+www-data-wp() {
+    local args=("$@")
+    su -s /bin/bash www-data -c "wp $(printf '%q ' "${args[@]}")"
+}
+
 COMPOSE_INITIALIZED_FLAG=/var/www/html/COMPOSE_INITIALIZED
 
 echo "Running extra tasks before starting apache..."
@@ -53,16 +59,16 @@ else
 
 	cd /var/www/html/
 
-	wp core install --allow-root --url=localhost:8080 \
-	   --title="Phel WP Plugin Demo Site" --admin_user=admin \
+	www-data-wp core install --url=localhost:8080 \
+	   --title='Phel WP Plugin Demo Site' --admin_user=admin \
 	   --admin_password=password --admin_email=example@example.com
 
 	# Not necessary but added so Apache doesn't make noise on startup
 	echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
-	wp plugin activate phel-wp-plugin --allow-root
+	www-data-wp plugin activate phel-wp-plugin
 
-	wp post create --post_status=publish --allow-root \
+	www-data-wp post create --post_status=publish \
 	   --post_title='Demo post' --post_content='
          <!-- wp:paragraph -->
            <p>Hello world.
