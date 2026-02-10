@@ -14,6 +14,7 @@ services:
   wp:
     build: .
     entrypoint: /custom-entrypoint.sh
+    user: root
     ports:
     # update custom-entrypoint.sh `wp core install` if changing port
       - "8080:80"
