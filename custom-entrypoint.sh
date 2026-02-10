@@ -22,11 +22,12 @@ chmod +x /usr/local/bin/apache2-noop
 
 ### END HACK
 
+COMPOSE_INITIALIZED_FLAG=/var/www/html/COMPOSE_INITIALIZED
 
 echo "Running extra tasks before starting apache..."
 
-if [ -f "/COMPOSE_INITIALIZED" ]; then
-	echo "Found /COMPOSE_INITIALIZED"
+if [ -f $COMPOSE_INITIALIZED_FLAG ]; then
+	echo "Found $COMPOSE_INITIALIZED_FLAG"
 	echo "Initialization in custom-entrypoint.sh already done. Skipping."
 else
 	echo "Running custom-entrypoint.sh initialization"
@@ -69,7 +70,7 @@ else
            </p>
          <!-- /wp:paragraph -->'
 
-	date > /COMPOSE_INITIALIZED
+	date > $COMPOSE_INITIALIZED_FLAG
 
 	echo ""
 	echo " , _                          , _     , _                    "
