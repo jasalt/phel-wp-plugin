@@ -45,7 +45,7 @@ The widget should be visible on admin dashboard. Try editing `src/main.phel` and
 # REPL usage
 [Phel REPL](https://phel-lang.org/documentation/repl/) starts with `vendor/bin/phel` command. Quick way to connect to into running development container:
 ```bash
-podman compose exec -w /var/www/html/wp-content/plugins/phel-wp-plugin wp vendor/bin/phel
+podman compose exec -u www-data -w /var/www/html/wp-content/plugins/phel-wp-plugin wp vendor/bin/phel
 ```
 
 Interfacing with the REPL works mostly as expected, examples:
