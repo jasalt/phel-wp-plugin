@@ -28,8 +28,8 @@ services:
       WORDPRESS_DEBUG: true
     volumes:
       - wordpress_data:/var/www/html
-      - ./custom-entrypoint.sh:/custom-entrypoint.sh
-      - .:/var/www/html/wp-content/plugins/phel-wp-plugin
+      - ./custom-entrypoint.sh:/custom-entrypoint.sh:Z
+      - .:/var/www/html/wp-content/plugins/phel-wp-plugin:Z
 
 volumes:
   db_data:
