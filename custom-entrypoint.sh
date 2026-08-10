@@ -30,6 +30,8 @@ www-data-wp() {
 
 COMPOSE_INITIALIZED_FLAG=/var/www/html/COMPOSE_INITIALIZED
 
+: "${WORDPRESS_PORT:?WORDPRESS_PORT must be set}"
+
 echo "Running extra tasks before starting apache..."
 
 if [ -f $COMPOSE_INITIALIZED_FLAG ]; then
@@ -59,7 +61,7 @@ else
 
 	cd /var/www/html/
 
-	www-data-wp core install --url=localhost:8080 \
+	www-data-wp core install --url="localhost:${WORDPRESS_PORT}" \
 	   --title='Phel WP Plugin Demo Site' --admin_user=admin \
 	   --admin_password=password --admin_email=example@example.com
 
@@ -72,7 +74,7 @@ else
 	   --post_title='Demo post' --post_content='
          <!-- wp:paragraph -->
            <p>Hello world.
-             <a href="http://localhost:8080/wp-admin/post.php?post=4&amp;action=edit">Login &amp; edit</a>
+             <a href="http://localhost:'"${WORDPRESS_PORT}"'/wp-admin/post.php?post=4&amp;action=edit">Login &amp; edit</a>
            </p>
          <!-- /wp:paragraph -->'
 
@@ -85,7 +87,7 @@ else
 	echo " |   |  |/|_/|_/     \/ \/    |       |   |_/ \/|_/\/|/|/ | |_/"
 	echo "                                                    (|"
 	echo ""
-	echo "Setup completed! Login to the site at http://localhost:8080/wp-admin/"
+	echo "Setup completed! Login to the site at http://localhost:${WORDPRESS_PORT}/wp-admin/"
 	echo ""
 	echo "Username: admin"
 	echo "Password: password"

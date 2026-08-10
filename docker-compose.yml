@@ -1,3 +1,5 @@
+x-wordpress-port: &wordpress-port 8089
+
 services:
   db:
     image: docker.io/mariadb:lts-ubi
@@ -15,8 +17,8 @@ services:
     build: .
     entrypoint: /custom-entrypoint.sh
     ports:
-    # update custom-entrypoint.sh `wp core install` command if changing port
-      - "8089:80"
+      - target: 80
+        published: *wordpress-port
     depends_on:
       - db
     restart: always
@@ -26,6 +28,7 @@ services:
       WORDPRESS_DB_PASSWORD: wordpress
       WORDPRESS_DB_NAME: wordpress
       WORDPRESS_DEBUG: true
+      WORDPRESS_PORT: *wordpress-port
     volumes:
       - wordpress_data:/var/www/html
       - ./custom-entrypoint.sh:/custom-entrypoint.sh:Z
