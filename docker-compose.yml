@@ -16,7 +16,7 @@ services:
     entrypoint: /custom-entrypoint.sh
     ports:
     # update custom-entrypoint.sh `wp core install` command if changing port
-      - "8080:80"
+      - "8089:80"
     depends_on:
       - db
     restart: always
