@@ -1,153 +1,136 @@
-{
-  pkgs,
-  lib,
-  config,
-  ...
-}:
+{ pkgs, lib, config, ... }:
 
-let
-  wordpressRoot = "${config.env.DEVENV_STATE}/wordpress";
-in
 {
-  # https://devenv.sh/packages/
+  # CLI tools available in the shell and used by tasks.
   packages = [
-    pkgs.coreutils
-    pkgs.mariadb
-    pkgs.wordpress
     pkgs.wp-cli
     pkgs.phpPackages.composer
   ];
 
-  # https://devenv.sh/languages/
-  languages = {
-    php.enable = true;
-    php.extensions = [
-      "curl"
-      "dom"
-      "exif"
-      "fileinfo"
-      "gd"
-      "mbstring"
-      "mysqli"
-      "openssl"
-      "pdo"
-      "pdo_mysql"
-      "xml"
-      "zip"
-    ];
-  };
+  languages.php = {
+    enable = true;
 
-  # Keep the database and WordPress installation in devenv state, not in the plugin repository.
-  env = {
-    WP_DB_NAME = "wordpress";
-    WP_DB_USER = "wordpress";
-    WP_DB_PASSWORD = "wordpress";
-    WP_DB_HOST = "127.0.0.1:3307";
-    WP_URL = "http://127.0.0.1:8080";
-  };
+    # PHP extensions required by WordPress.
+    # Note: xml, mbstring, curl, dom, fileinfo, openssl, pdo are enabled by default.
+    extensions = [
+      "mysqli"     # MySQL database connectivity
+      "pdo_mysql"  # PDO MySQL driver (used by some plugins)
+      "gd"         # Image manipulation (thumbnails, image editing)
+      "zip"        # Plugin/theme installation from zip files
+      "exif"       # Image metadata reading
+    ];
 
-  # https://devenv.sh/services/
-  services = {
-    mysql.enable = true;
-    mysql.initialDatabases = [
-      { name = "wordpress"; }
-    ];
-    mysql.ensureUsers = [
-      {
-        name = "wordpress";
-        host = "127.0.0.1";
-        password = "wordpress";
-        ensurePermissions = {
-          "wordpress.*" = "ALL PRIVILEGES";
-        };
-      }
-    ];
-    mysql.settings = {
-      "bind-address" = "127.0.0.1";
-      port = 3307;
+    # PHP-FPM pool configuration — manages PHP worker processes.
+    fpm.pools.web = {
+      settings = {
+        "pm" = "dynamic";
+        "pm.max_children" = 10;
+        "pm.start_servers" = 2;
+        "pm.min_spare_servers" = 1;
+        "pm.max_spare_servers" = 5;
+      };
     };
   };
 
-  # https://devenv.sh/processes/
-  # The bootstrap waits for MySQL, copies immutable WordPress core into devenv state,
-  # and symlinks this repository into wp-content/plugins before serving the site.
-  processes = {
-    wordpress.exec = ''
-      set -eu
+  # MariaDB database server.
+  services.mysql = {
+    enable = true;
+    package = pkgs.mariadb;
 
-      wordpressRoot="${wordpressRoot}"
-      pluginSource="${config.env.DEVENV_ROOT}"
-      composer install --working-dir="$pluginSource"
-      coreSource="${pkgs.wordpress}/share/wordpress"
+    # Create the WordPress database on first run.
+    initialDatabases = [{ name = "wordpress"; }];
 
-      if [ ! -d "$coreSource" ]; then
-        coreSource="${pkgs.wordpress}"
+    # Create database user with access to the WordPress database.
+    ensureUsers = [{
+      name = "wordpress";
+      password = "wordpress";
+      ensurePermissions = { "wordpress.*" = "ALL PRIVILEGES"; };
+    }];
+  };
+
+  # Caddy web server — serves WordPress via PHP-FPM.
+  services.caddy = {
+    enable = true;
+
+    virtualHosts."http://localhost:8080/" = {
+      extraConfig = ''
+        root * ${config.devenv.root}/wordpress
+
+        # Pass PHP requests to PHP-FPM.
+        php_fastcgi unix/${config.languages.php.fpm.pools.web.socket}
+
+        # Serve static files directly.
+        file_server
+      '';
+    };
+  };
+
+  # Download WordPress, symlink the plugin, and write wp-config.php
+  # once MariaDB is ready and seeded.
+  tasks."wordpress:setup" = {
+    description = "Download WordPress, link the plugin, and create wp-config.php";
+    after = [ "devenv:mysql:configure" ];
+    cwd = config.devenv.root;
+    exec = ''
+      set -e
+
+      mkdir -p wordpress
+      cd wordpress
+
+      # Download WordPress core if not already present.
+      if [ ! -f wp-includes/version.php ]; then
+        echo "Downloading WordPress..."
+        wp core download
+      else
+        echo "WordPress already downloaded."
       fi
 
-      mkdir -p "$wordpressRoot"
-      if [ ! -f "$wordpressRoot/wp-includes/version.php" ]; then
-        rm -rf "$wordpressRoot"
-        mkdir -p "$wordpressRoot"
-        cp -R --no-preserve=mode,ownership "$coreSource"/. "$wordpressRoot"/
+      # Symlink this plugin into wp-content/plugins.
+      mkdir -p wp-content/plugins
+      pluginName="$(basename "$DEVENV_ROOT")"
+      pluginTarget="wp-content/plugins/$pluginName"
+      if [ ! -e "$pluginTarget" ]; then
+        ln -s "$DEVENV_ROOT" "$pluginTarget"
+        echo "Plugin symlinked: $pluginTarget -> $DEVENV_ROOT"
       fi
 
-      mkdir -p "$wordpressRoot/wp-content/plugins"
-      pluginName="$(basename "$pluginSource")"
-      pluginTarget="$wordpressRoot/wp-content/plugins/$pluginName"
-      rm -rf "$pluginTarget"
-      ln -s "$pluginSource" "$pluginTarget"
+      # Install plugin Composer dependencies.
+      composer install --working-dir="$DEVENV_ROOT" --no-interaction 2>&1 || true
 
-      cat > "$wordpressRoot/router.php" <<'PHP_ROUTER'
-      <?php
-      $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-      $file = __DIR__ . $path;
-      if ($path !== '/' && is_file($file)) {
-          return false;
-      }
-      require __DIR__ . '/index.php';
-      PHP_ROUTER
-
-      until mysqladmin \
-        --protocol=tcp \
-        --host=127.0.0.1 \
-        --port=3307 \
-        --user="$WP_DB_USER" \
-        --password="$WP_DB_PASSWORD" \
-        ping >/dev/null 2>&1; do
-        sleep 1
-      done
-
-      if [ ! -f "$wordpressRoot/wp-config.php" ]; then
+      # Create wp-config.php if not already present.
+      if [ ! -f wp-config.php ]; then
+        echo "Creating wp-config.php..."
         wp config create \
-          --path="$wordpressRoot" \
-          --dbname="$WP_DB_NAME" \
-          --dbuser="$WP_DB_USER" \
-          --dbpass="$WP_DB_PASSWORD" \
-          --dbhost="$WP_DB_HOST" \
-          --skip-check
+          --dbname=wordpress \
+          --dbuser=wordpress \
+          --dbpass=wordpress \
+          --dbhost=127.0.0.1
+        echo ""
+        echo "WordPress configured! Visit http://localhost:8080/ to complete installation."
+      else
+        echo "wp-config.php already exists."
       fi
-
-      if ! wp core is-installed --path="$wordpressRoot" >/dev/null 2>&1; then
-        wp core install \
-          --path="$wordpressRoot" \
-          --url="$WP_URL" \
-          --title="WordPress Plugin Development" \
-          --admin_user="admin" \
-          --admin_password="admin" \
-          --admin_email="admin@example.test" \
-          --skip-email
-      fi
-
-      echo "WordPress: $WP_URL"
-      echo "Plugin:    $pluginName"
-      echo "Admin:     admin / admin"
-      exec php -S 127.0.0.1:8080 -t "$wordpressRoot" "$wordpressRoot/router.php"
     '';
   };
 
-  enterShell = ''
-    echo "WordPress plugin environment ready. Run: devenv up"
-  '';
+  # Hold Caddy until WordPress is on disk so the first request isn't a 404.
+  processes.caddy.after = [ "wordpress:setup" ];
 
-  # See full reference at https://devenv.sh/reference/options/
+  # Show helpful instructions when entering the shell.
+  enterShell = ''
+    echo ""
+    echo "============================================="
+    echo "  WordPress Plugin Development Environment"
+    echo "============================================="
+    echo ""
+    echo "Run: devenv up"
+    echo "Then open: http://localhost:8080/"
+    echo ""
+    echo "Database credentials:"
+    echo "  Host:     127.0.0.1"
+    echo "  Database: wordpress"
+    echo "  User:     wordpress"
+    echo "  Password: wordpress"
+    echo ""
+  '';
 }
