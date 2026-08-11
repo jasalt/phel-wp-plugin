@@ -125,12 +125,15 @@ in
           --dbname=wordpress \
           --dbuser=wordpress \
           --dbpass=wordpress \
-          --dbhost=127.0.0.1
+          --dbhost=127.0.0.1:3307
         echo ""
         echo "WordPress configured! Visit http://localhost:8080/ to complete installation."
       else
         echo "wp-config.php already exists."
       fi
+
+      # Keep WordPress pointed at devenv's MariaDB port.
+      wp config set DB_HOST 127.0.0.1:3307
 
       # Enable useful WordPress development logging by default.
       wp config set WP_DEBUG true --raw
