@@ -1,5 +1,21 @@
 { pkgs, lib, config, ... }:
 
+let
+  startupMessage = ''
+    printf '%s\n' ' , _                          , _     , _'
+    printf '%s\n' '/|/ \\|     _ |\\    (|  |  |_//|/ \\   /|/ \\|\\        _, o'
+    printf '%s\n' ' |__/|/\\  |/ |/     |  |  |   |__/    |__/|/ |  |  / | | /|/'
+    printf '%s\n' ' |   |  |/|_/|_/     \\  /\\    |       |   |_/ \\/|_/\\/|/ | |_/'
+    printf '%s\n' '                                                    (|'
+    printf '\n'
+    printf '%s\n' 'Setup completed! Login to the site at http://localhost:8080/wp-admin/'
+    printf '\n'
+    printf '%s\n' 'Username: admin'
+    printf '%s\n' 'Password: password'
+    printf '\n'
+    printf '%s\n' 'Phel admin widget should be visible on the dashboard...'
+  '';
+in
 {
   # CLI tools available in the shell and used by tasks.
   packages = [
@@ -152,6 +168,9 @@
 <p>Hello world. <a href=\"http://localhost:8080/wp-admin/post.php?post=$${postId}&amp;action=edit\">Login &amp; edit</a></p>
 <!-- /wp:paragraph -->"
       wp post update "$postId" --post_content="$postContent" >/dev/null
+
+      ${startupMessage}
+
       echo "Default administrator: admin / password"
       echo "Plugin activated: $pluginName"
     '';
@@ -175,6 +194,7 @@
     echo "  Database: wordpress"
     echo "  User:     wordpress"
     echo "  Password: wordpress"
+    ${startupMessage}
     echo ""
   '';
 }
