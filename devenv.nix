@@ -73,8 +73,9 @@ in
       extraConfig = ''
         root * ${config.devenv.root}/wordpress
 
-        # WordPress permalink handling: route non-file requests to index.php.
-        try_files {path} {path}/index.php /index.php?{query}
+        # WordPress permalink handling: serve static files directly;
+        # only route non-file requests to the WordPress front controller.
+        try_files {path} /index.php?{query}
 
         # Pass PHP requests to PHP-FPM.
         php_fastcgi unix/${config.languages.php.fpm.pools.web.socket}
@@ -145,6 +146,10 @@ in
           --admin_password=password \
           --admin_email=admin@example.com
       fi
+
+      # Use pretty permalinks so WordPress receives path-based requests and
+      # returns a 404 for unknown slugs instead of canonicalizing to home.
+      wp rewrite structure '/%postname%/'
 
       if wp user get admin >/dev/null 2>&1; then
         wp user update admin \
