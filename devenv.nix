@@ -135,7 +135,25 @@
           --role=administrator
       fi
 
+      # Activate this plugin after WordPress provisioning.
+      wp plugin activate "$pluginName"
+
+      # Create the demo post once, matching custom-entrypoint.sh.
+      postId="$(wp post list --name=demo-post --post_type=post --format=ids | awk 'NR == 1 { print $1 }')"
+      if [ -z "$postId" ]; then
+        postId="$(wp post create \
+          --post_status=publish \
+          --post_title="Demo post" \
+          --post_name=demo-post \
+          --post_content="Hello world." \
+          --porcelain)"
+      fi
+      postContent="<!-- wp:paragraph -->
+<p>Hello world. <a href=\"http://localhost:8080/wp-admin/post.php?post=$${postId}&amp;action=edit\">Login &amp; edit</a></p>
+<!-- /wp:paragraph -->"
+      wp post update "$postId" --post_content="$postContent" >/dev/null
       echo "Default administrator: admin / password"
+      echo "Plugin activated: $pluginName"
     '';
   };
 
