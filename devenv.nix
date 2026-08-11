@@ -52,9 +52,13 @@
   services.caddy = {
     enable = true;
 
-    virtualHosts."http://localhost:8080/" = {
+    # No trailing slash: devenv 2.2.1 otherwise emits an exact `/` path matcher.
+    virtualHosts."http://localhost:8080" = {
       extraConfig = ''
         root * ${config.devenv.root}/wordpress
+
+        # WordPress permalink handling: route non-file requests to index.php.
+        try_files {path} {path}/index.php /index.php?{query}
 
         # Pass PHP requests to PHP-FPM.
         php_fastcgi unix/${config.languages.php.fpm.pools.web.socket}
