@@ -2,4 +2,4 @@
 
 (println "Phel running as WP-CLI command.")
 (println "Supplied args:" *argv*)
-(println "You have" (.publish php/wp_count_posts) "posts in the database.")
+(println "You have" (.-publish (php/wp_count_posts)) "posts in the database.")
