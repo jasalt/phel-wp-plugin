@@ -4,34 +4,124 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "79e6fc2cba6b7b2a03ab7071ad0b8eda",
+    "content-hash": "b35d9583a01e08808c39d06f992ee75d",
     "packages": [
         {
-            "name": "gacela-project/container",
-            "version": "0.10.0",
+            "name": "amphp/amp",
+            "version": "3.x-dev",
             "source": {
                 "type": "git",
-                "url": "https://github.com/gacela-project/container.git",
-                "reference": "db13556a11f6892c852ef0f26a9915aee2a3ba4e"
+                "url": "https://github.com/amphp/amp.git",
+                "reference": "73c38b323ff8d790abf0f76c56fcc892bda4111a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/gacela-project/container/zipball/db13556a11f6892c852ef0f26a9915aee2a3ba4e",
-                "reference": "db13556a11f6892c852ef0f26a9915aee2a3ba4e",
+                "url": "https://api.github.com/repos/amphp/amp/zipball/73c38b323ff8d790abf0f76c56fcc892bda4111a",
+                "reference": "73c38b323ff8d790abf0f76c56fcc892bda4111a",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.1",
-                "psr/container": ">=1.1"
+                "revolt/event-loop": "^1 || ^0.2"
+            },
+            "require-dev": {
+                "amphp/php-cs-fixer-config": "^2",
+                "phpunit/phpunit": "^9",
+                "psalm/phar": "6.16.1"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/functions.php",
+                    "src/Future/functions.php",
+                    "src/Internal/functions.php"
+                ],
+                "psr-4": {
+                    "Amp\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Aaron Piotrowski",
+                    "email": "aaron@trowski.com"
+                },
+                {
+                    "name": "Bob Weinand",
+                    "email": "bobwei9@hotmail.com"
+                },
+                {
+                    "name": "Niklas Keller",
+                    "email": "me@kelunik.com"
+                },
+                {
+                    "name": "Daniel Lowrey",
+                    "email": "rdlowrey@php.net"
+                }
+            ],
+            "description": "A non-blocking concurrency framework for PHP applications.",
+            "homepage": "https://amphp.org/amp",
+            "keywords": [
+                "async",
+                "asynchronous",
+                "awaitable",
+                "concurrency",
+                "event",
+                "event-loop",
+                "future",
+                "non-blocking",
+                "promise"
+            ],
+            "support": {
+                "issues": "https://github.com/amphp/amp/issues",
+                "source": "https://github.com/amphp/amp/tree/3.x"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/amphp",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-07-19T17:59:20+00:00"
+        },
+        {
+            "name": "gacela-project/container",
+            "version": "2.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/gacela-project/container.git",
+                "reference": "e9ac0b6b5c6b0eb8724e04b8e9cbc829f43c6707"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/gacela-project/container/zipball/e9ac0b6b5c6b0eb8724e04b8e9cbc829f43c6707",
+                "reference": "e9ac0b6b5c6b0eb8724e04b8e9cbc829f43c6707",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.3",
+                "psr/container": "^1.1 || ^2.0"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3.75",
-                "phpstan/phpstan": "^1.12",
-                "phpunit/phpunit": "^10.5",
-                "psalm/plugin-phpunit": "^0.18",
-                "symfony/var-dumper": "^5.4",
-                "vimeo/psalm": "^5.26"
+                "infection/infection": "^0.31 || ^0.34",
+                "phpbench/phpbench": "^1.4",
+                "phpstan/phpstan": "^2.2",
+                "phpunit/phpunit": "^12.5",
+                "symfony/var-dumper": "^6.4 || ^7.0",
+                "symfony/yaml": "^6.4 || ^7.0",
+                "vimeo/psalm": "^6.16"
             },
+            "suggest": {
+                "symfony/yaml": "To load container definitions from .yaml/.yml files with loadFile(); not required — parse it yourself and use load()"
+            },
+            "bin": [
+                "bin/gacela-container"
+            ],
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -64,7 +154,7 @@
             ],
             "support": {
                 "issues": "https://github.com/gacela-project/container/issues",
-                "source": "https://github.com/gacela-project/container/tree/0.10.0"
+                "source": "https://github.com/gacela-project/container/tree/2.0.2"
             },
             "funding": [
                 {
@@ -72,57 +162,79 @@
                     "type": "custom"
                 }
             ],
-            "time": "2026-07-19T22:59:58+00:00"
+            "time": "2026-08-06T08:42:24+00:00"
         },
         {
             "name": "gacela-project/gacela",
-            "version": "1.21.0",
+            "version": "2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/gacela-project/gacela.git",
-                "reference": "32fef1b9651f72e8006c4f0cf7b3bf618bf381be"
+                "reference": "dc8833777729810bb792261ebce3c79cb1f54777"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/gacela-project/gacela/zipball/32fef1b9651f72e8006c4f0cf7b3bf618bf381be",
-                "reference": "32fef1b9651f72e8006c4f0cf7b3bf618bf381be",
+                "url": "https://api.github.com/repos/gacela-project/gacela/zipball/dc8833777729810bb792261ebce3c79cb1f54777",
+                "reference": "dc8833777729810bb792261ebce3c79cb1f54777",
                 "shasum": ""
             },
             "require": {
-                "gacela-project/container": "^0.10.0",
-                "php": ">=8.1"
+                "gacela-project/container": "^2.0.2",
+                "php": ">=8.3"
             },
             "require-dev": {
+                "bamarni/composer-bin-plugin": "^1.8",
                 "ergebnis/composer-normalize": "^2.50",
                 "friendsofphp/php-cs-fixer": "^3.95",
-                "infection/infection": "^0.29",
-                "nikic/php-parser": "^5.0",
+                "illuminate/config": "^11.28 || ^12.0",
+                "illuminate/console": "^11.28 || ^12.0",
+                "illuminate/container": "^11.28 || ^12.0",
+                "illuminate/contracts": "^11.28 || ^12.0",
+                "illuminate/events": "^11.28 || ^12.0",
+                "illuminate/support": "^11.28 || ^12.0",
+                "infection/infection": "^0.34",
+                "nikic/php-parser": "^5.4",
                 "phpbench/phpbench": "^1.4",
                 "phpmetrics/phpmetrics": "^2.9",
                 "phpstan/phpstan": "^2.0",
                 "phpstan/phpstan-strict-rules": "^2.0",
-                "phpunit/phpunit": "^10.5",
-                "psalm/plugin-phpunit": "^0.19.5",
-                "rector/rector": "^2.0",
-                "symfony/console": "^6.4",
-                "symfony/dependency-injection": "^6.4",
-                "symfony/var-dumper": "^6.4",
+                "phpunit/phpunit": "^12.5",
+                "psalm/plugin-phpunit": "^0.19.7",
+                "symfony/config": "^7.0 || ^8.0",
+                "symfony/console": "^7.0 || ^8.0",
+                "symfony/dependency-injection": "^7.0 || ^8.0",
+                "symfony/http-kernel": "^7.0 || ^8.0",
+                "symfony/var-dumper": "^7.0 || ^8.0",
                 "vimeo/psalm": "^6.16"
             },
             "suggest": {
                 "gacela-project/gacela-env-config-reader": "Allows to read .env config files",
                 "gacela-project/gacela-yaml-config-reader": "Allows to read yml/yaml config files",
-                "gacela-project/phpstan-extension": "A set of phpstan rules for Gacela",
+                "illuminate/support": "Allows to register Gacela\\LaravelBridge\\GacelaServiceProvider in a Laravel application",
                 "phpunit/phpunit": "Allows to extend Gacela\\Framework\\Testing\\GacelaTestCase in your tests",
-                "symfony/console": "Allows to use vendor/bin/gacela script"
+                "symfony/console": "Allows to use vendor/bin/gacela script",
+                "symfony/http-kernel": "Allows to register Gacela\\SymfonyBridge\\GacelaBundle in a Symfony application"
             },
             "bin": [
                 "bin/gacela"
             ],
             "type": "library",
+            "extra": {
+                "phpstan": {
+                    "includes": [
+                        "phpstan-gacela.neon"
+                    ]
+                },
+                "bamarni-bin": {
+                    "bin-links": false,
+                    "forward-command": true
+                }
+            },
             "autoload": {
                 "psr-4": {
-                    "Gacela\\": "src/"
+                    "Gacela\\": "src/",
+                    "Gacela\\LaravelBridge\\": "laravel-bridge/src/",
+                    "Gacela\\SymfonyBridge\\": "symfony-bridge/src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -151,7 +263,7 @@
             ],
             "support": {
                 "issues": "https://github.com/gacela-project/gacela/issues",
-                "source": "https://github.com/gacela-project/gacela/tree/1.21.0"
+                "source": "https://github.com/gacela-project/gacela/tree/2.2.0"
             },
             "funding": [
                 {
@@ -159,40 +271,46 @@
                     "type": "custom"
                 }
             ],
-            "time": "2026-07-26T01:29:08+00:00"
+            "time": "2026-08-11T12:42:08+00:00"
         },
         {
             "name": "phel-lang/phel-lang",
-            "version": "v0.29.0",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phel-lang/phel-lang.git",
-                "reference": "06ebd8102dcce28b435cd900015390d478775975"
+                "reference": "6eaad0251b7399e3b4afdc97ef6153157be3dc07"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phel-lang/phel-lang/zipball/06ebd8102dcce28b435cd900015390d478775975",
-                "reference": "06ebd8102dcce28b435cd900015390d478775975",
+                "url": "https://api.github.com/repos/phel-lang/phel-lang/zipball/6eaad0251b7399e3b4afdc97ef6153157be3dc07",
+                "reference": "6eaad0251b7399e3b4afdc97ef6153157be3dc07",
                 "shasum": ""
             },
             "require": {
-                "gacela-project/gacela": "^1.12",
-                "php": ">=8.3",
-                "phpunit/php-timer": "^6.0|^7.0|^8.0",
-                "symfony/console": "^6.0|^7.0|^8.0"
+                "amphp/amp": "^3.1",
+                "gacela-project/gacela": "^2.0",
+                "php": ">=8.4",
+                "symfony/console": "^7.3|^8.0",
+                "symfony/polyfill-mbstring": "^1.30",
+                "symfony/routing": "^7.3|^8.0"
             },
             "require-dev": {
-                "ergebnis/composer-normalize": "^2.48",
+                "brianium/paratest": "^7",
+                "ergebnis/composer-normalize": "^2.50",
                 "ext-readline": "*",
-                "friendsofphp/php-cs-fixer": "^3.92",
-                "phpbench/phpbench": "^1.4",
+                "friendsofphp/php-cs-fixer": "^3.94",
+                "infection/infection": "^0.34",
+                "phpbench/phpbench": "^1.6",
                 "phpstan/phpstan": "^2.1",
-                "phpunit/phpunit": "^10.5",
-                "psalm/plugin-phpunit": "^0.19",
-                "rector/rector": "^2.2",
-                "symfony/var-dumper": "^7.4",
-                "vimeo/psalm": "^6.14"
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpunit/phpunit": "^11.0|^12.0|^13.0",
+                "psalm/plugin-phpunit": "^0.19|^0.20",
+                "rector/rector": "^2.3",
+                "vimeo/psalm": "^6.16"
             },
+            "default-branch": true,
             "bin": [
                 "bin/phel"
             ],
@@ -216,7 +334,7 @@
                 },
                 {
                     "name": "Jose M. Valera Reales",
-                    "email": "phel@chemaclass.es",
+                    "email": "phel@chemaclass.com",
                     "homepage": "https://chemaclass.com"
                 }
             ],
@@ -230,7 +348,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phel-lang/phel-lang/issues",
-                "source": "https://github.com/phel-lang/phel-lang/tree/v0.29.0"
+                "source": "https://github.com/phel-lang/phel-lang/tree/main"
             },
             "funding": [
                 {
@@ -238,79 +356,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2026-02-01T13:18:54+00:00"
-        },
-        {
-            "name": "phpunit/php-timer",
-            "version": "8.0.x-dev",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/sebastianbergmann/php-timer.git",
-                "reference": "33cfa24383d565e27f75c0a0be6209203461383e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-timer/zipball/33cfa24383d565e27f75c0a0be6209203461383e",
-                "reference": "33cfa24383d565e27f75c0a0be6209203461383e",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=8.3"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^12.5.33"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-main": "8.0-dev"
-                }
-            },
-            "autoload": {
-                "classmap": [
-                    "src/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de",
-                    "role": "lead"
-                }
-            ],
-            "description": "Utility class for timing",
-            "homepage": "https://github.com/sebastianbergmann/php-timer/",
-            "keywords": [
-                "timer"
-            ],
-            "support": {
-                "issues": "https://github.com/sebastianbergmann/php-timer/issues",
-                "security": "https://github.com/sebastianbergmann/php-timer/security/policy",
-                "source": "https://github.com/sebastianbergmann/php-timer/tree/8.0"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/sebastianbergmann",
-                    "type": "github"
-                },
-                {
-                    "url": "https://liberapay.com/sebastianbergmann",
-                    "type": "liberapay"
-                },
-                {
-                    "url": "https://thanks.dev/u/gh/sebastianbergmann",
-                    "type": "thanks_dev"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/phpunit/php-timer",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2026-08-05T04:56:55+00:00"
+            "time": "2026-08-11T12:30:27+00:00"
         },
         {
             "name": "psr/container",
@@ -367,48 +413,113 @@
             "time": "2023-09-22T11:11:30+00:00"
         },
         {
-            "name": "symfony/console",
-            "version": "7.4.x-dev",
+            "name": "revolt/event-loop",
+            "version": "dev-main",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony/console.git",
-                "reference": "ddb75f559ddac4f809e38477d9f0aeb67057e297"
+                "url": "https://github.com/revoltphp/event-loop.git",
+                "reference": "7b2ce25ca927194808d9f330ccfdbc8244ce65a5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/ddb75f559ddac4f809e38477d9f0aeb67057e297",
-                "reference": "ddb75f559ddac4f809e38477d9f0aeb67057e297",
+                "url": "https://api.github.com/repos/revoltphp/event-loop/zipball/7b2ce25ca927194808d9f330ccfdbc8244ce65a5",
+                "reference": "7b2ce25ca927194808d9f330ccfdbc8244ce65a5",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.2",
-                "symfony/deprecation-contracts": "^2.5|^3",
-                "symfony/polyfill-mbstring": "~1.0",
-                "symfony/service-contracts": "^2.5|^3",
-                "symfony/string": "^7.2|^8.0"
+                "php": ">=8.1"
             },
-            "conflict": {
-                "symfony/dependency-injection": "<6.4",
-                "symfony/dotenv": "<6.4",
-                "symfony/event-dispatcher": "<6.4",
-                "symfony/lock": "<6.4",
-                "symfony/process": "<6.4"
+            "require-dev": {
+                "ext-json": "*",
+                "jetbrains/phpstorm-stubs": "^2019.3",
+                "phpunit/phpunit": "^9",
+                "psalm/phar": "6.16.*"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Revolt\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Aaron Piotrowski",
+                    "email": "aaron@trowski.com"
+                },
+                {
+                    "name": "Cees-Jan Kiewiet",
+                    "email": "ceesjank@gmail.com"
+                },
+                {
+                    "name": "Christian Lück",
+                    "email": "christian@clue.engineering"
+                },
+                {
+                    "name": "Niklas Keller",
+                    "email": "me@kelunik.com"
+                }
+            ],
+            "description": "Rock-solid event loop for concurrent PHP applications.",
+            "keywords": [
+                "async",
+                "asynchronous",
+                "concurrency",
+                "event",
+                "event-loop",
+                "non-blocking",
+                "scheduler"
+            ],
+            "support": {
+                "issues": "https://github.com/revoltphp/event-loop/issues",
+                "source": "https://github.com/revoltphp/event-loop/tree/main"
+            },
+            "time": "2026-06-27T18:40:18+00:00"
+        },
+        {
+            "name": "symfony/console",
+            "version": "8.0.x-dev",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/console.git",
+                "reference": "159ee319520722f0ff4410e81d7ee1b5343ea387"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/console/zipball/159ee319520722f0ff4410e81d7ee1b5343ea387",
+                "reference": "159ee319520722f0ff4410e81d7ee1b5343ea387",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.4",
+                "symfony/polyfill-mbstring": "^1.0",
+                "symfony/service-contracts": "^2.5|^3",
+                "symfony/string": "^7.4|^8.0"
             },
             "provide": {
                 "psr/log-implementation": "1.0|2.0|3.0"
             },
             "require-dev": {
                 "psr/log": "^1|^2|^3",
-                "symfony/config": "^6.4|^7.0|^8.0",
-                "symfony/dependency-injection": "^6.4|^7.0|^8.0",
-                "symfony/event-dispatcher": "^6.4|^7.0|^8.0",
-                "symfony/http-foundation": "^6.4|^7.0|^8.0",
-                "symfony/http-kernel": "^6.4|^7.0|^8.0",
-                "symfony/lock": "^6.4|^7.0|^8.0",
-                "symfony/messenger": "^6.4|^7.0|^8.0",
-                "symfony/process": "^6.4|^7.0|^8.0",
-                "symfony/stopwatch": "^6.4|^7.0|^8.0",
-                "symfony/var-dumper": "^6.4|^7.0|^8.0"
+                "symfony/config": "^7.4|^8.0",
+                "symfony/dependency-injection": "^7.4|^8.0",
+                "symfony/event-dispatcher": "^7.4|^8.0",
+                "symfony/http-foundation": "^7.4|^8.0",
+                "symfony/http-kernel": "^7.4|^8.0",
+                "symfony/lock": "^7.4|^8.0",
+                "symfony/messenger": "^7.4|^8.0",
+                "symfony/process": "^7.4|^8.0",
+                "symfony/stopwatch": "^7.4|^8.0",
+                "symfony/var-dumper": "^7.4|^8.0"
             },
             "type": "library",
             "autoload": {
@@ -442,7 +553,7 @@
                 "terminal"
             ],
             "support": {
-                "source": "https://github.com/symfony/console/tree/7.4"
+                "source": "https://github.com/symfony/console/tree/8.0"
             },
             "funding": [
                 {
@@ -462,7 +573,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-08-11T11:45:54+00:00"
+            "time": "2026-08-02T21:50:27+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -876,6 +987,86 @@
             "time": "2026-05-27T06:59:30+00:00"
         },
         {
+            "name": "symfony/routing",
+            "version": "8.0.x-dev",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/routing.git",
+                "reference": "359205bbe7a56177b40426ec6373f47ca192ac13"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/routing/zipball/359205bbe7a56177b40426ec6373f47ca192ac13",
+                "reference": "359205bbe7a56177b40426ec6373f47ca192ac13",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.4",
+                "symfony/deprecation-contracts": "^2.5|^3"
+            },
+            "require-dev": {
+                "psr/log": "^1|^2|^3",
+                "symfony/config": "^7.4|^8.0",
+                "symfony/dependency-injection": "^7.4|^8.0",
+                "symfony/expression-language": "^7.4|^8.0",
+                "symfony/http-foundation": "^7.4|^8.0",
+                "symfony/yaml": "^7.4|^8.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Routing\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Maps an HTTP request to a set of configuration variables",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "router",
+                "routing",
+                "uri",
+                "url"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/routing/tree/8.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2026-07-22T15:20:43+00:00"
+        },
+        {
             "name": "symfony/service-contracts",
             "version": "dev-main",
             "source": {
@@ -965,35 +1156,34 @@
         },
         {
             "name": "symfony/string",
-            "version": "7.4.x-dev",
+            "version": "8.0.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/string.git",
-                "reference": "e394af32256bf9e7bf80849d95e589167c10097b"
+                "reference": "1a6a4245943af4dabe57d269bd0903f9d140a15e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/string/zipball/e394af32256bf9e7bf80849d95e589167c10097b",
-                "reference": "e394af32256bf9e7bf80849d95e589167c10097b",
+                "url": "https://api.github.com/repos/symfony/string/zipball/1a6a4245943af4dabe57d269bd0903f9d140a15e",
+                "reference": "1a6a4245943af4dabe57d269bd0903f9d140a15e",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.2",
-                "symfony/deprecation-contracts": "^2.5|^3.0",
-                "symfony/polyfill-ctype": "~1.8",
-                "symfony/polyfill-intl-grapheme": "~1.33",
-                "symfony/polyfill-intl-normalizer": "~1.0",
-                "symfony/polyfill-mbstring": "~1.0"
+                "php": ">=8.4",
+                "symfony/polyfill-ctype": "^1.8",
+                "symfony/polyfill-intl-grapheme": "^1.33",
+                "symfony/polyfill-intl-normalizer": "^1.0",
+                "symfony/polyfill-mbstring": "^1.0"
             },
             "conflict": {
                 "symfony/translation-contracts": "<2.5"
             },
             "require-dev": {
-                "symfony/emoji": "^7.1|^8.0",
-                "symfony/http-client": "^6.4|^7.0|^8.0",
-                "symfony/intl": "^6.4|^7.0|^8.0",
+                "symfony/emoji": "^7.4|^8.0",
+                "symfony/http-client": "^7.4|^8.0",
+                "symfony/intl": "^7.4|^8.0",
                 "symfony/translation-contracts": "^2.5|^3.0",
-                "symfony/var-exporter": "^6.4|^7.0|^8.0"
+                "symfony/var-exporter": "^7.4|^8.0"
             },
             "type": "library",
             "autoload": {
@@ -1032,7 +1222,7 @@
                 "utf8"
             ],
             "support": {
-                "source": "https://github.com/symfony/string/tree/7.4"
+                "source": "https://github.com/symfony/string/tree/8.0"
             },
             "funding": [
                 {
@@ -1052,21 +1242,23 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-07-28T07:33:02+00:00"
+            "time": "2026-07-28T07:34:23+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": {
+        "phel-lang/phel-lang": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=8.3"
+        "php": ">=8.4"
     },
     "platform-dev": {},
     "platform-overrides": {
-        "php": "8.3"
+        "php": "8.4"
     },
     "plugin-api-version": "2.9.0"
 }
