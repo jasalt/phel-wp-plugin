@@ -131,6 +131,11 @@ in
         echo "wp-config.php already exists."
       fi
 
+      # Enable useful WordPress development logging by default.
+      wp config set WP_DEBUG true --raw
+      wp config set WP_DEBUG_LOG true --raw
+      wp config set WP_DEBUG_DISPLAY false --raw
+
       # Install WordPress and ensure the default development administrator exists.
       if ! wp core is-installed; then
         wp core install \
