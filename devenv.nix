@@ -141,7 +141,7 @@ in
       if ! wp core is-installed; then
         wp core install \
           --url=http://localhost:8080 \
-          --title="WordPress Plugin Development" \
+          --title="Phel WP Plugin Demo Site" \
           --admin_user=admin \
           --admin_password=password \
           --admin_email=admin@example.com
