@@ -4,3 +4,7 @@ local/
 vendor/
 
 phel-config-local.php
+
+# devenv
+.devenv/
+wordpress/
