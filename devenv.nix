@@ -114,6 +114,28 @@
       else
         echo "wp-config.php already exists."
       fi
+
+      # Install WordPress and ensure the default development administrator exists.
+      if ! wp core is-installed; then
+        wp core install \
+          --url=http://localhost:8080 \
+          --title="WordPress Plugin Development" \
+          --admin_user=admin \
+          --admin_password=password \
+          --admin_email=admin@example.com
+      fi
+
+      if wp user get admin >/dev/null 2>&1; then
+        wp user update admin \
+          --user_pass=password \
+          --role=administrator
+      else
+        wp user create admin admin@example.com \
+          --user_pass=password \
+          --role=administrator
+      fi
+
+      echo "Default administrator: admin / password"
     '';
   };
 
