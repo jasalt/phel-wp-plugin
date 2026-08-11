@@ -15,13 +15,13 @@
     }
   ],
   "require": {
-    "php": ">=8.3",
-    "phel-lang/phel-lang": "0.29.0"
+    "php": ">=8.4",
+    "phel-lang/phel-lang": "dev-main"
   },
   "minimum-stability": "dev",
   "config": {
     "platform": {
-      "php": "8.3"
+      "php": "8.4"
     },
     "sort-packages": true
   }
