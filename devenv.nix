@@ -15,6 +15,7 @@ in
     pkgs.mariadb
     pkgs.wordpress
     pkgs.wp-cli
+    pkgs.phpPackages.composer
   ];
 
   # https://devenv.sh/languages/
@@ -76,6 +77,7 @@ in
 
       wordpressRoot="${wordpressRoot}"
       pluginSource="${config.env.DEVENV_ROOT}"
+      composer install --working-dir="$pluginSource"
       coreSource="${pkgs.wordpress}/share/wordpress"
 
       if [ ! -d "$coreSource" ]; then
