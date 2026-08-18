@@ -1,0 +1,167 @@
+(ns phel-wp-plugin.collab
+  (:require phel.html :refer [html]))
+
+(def state-option "phel_collab_demo_state")
+(def nonce-action "phel_collab_demo")
+
+(defn default-state []
+  #php {"revision" 0
+        "message" "Open this dashboard as two users and edit this shared note."
+        "updated_by" "Nobody yet"
+        "updated_at" ""})
+
+;; A deliberately small "global cursor": unlike Hyper's in-process cursor this
+;; value is reconstructed from persistent WordPress state on every PHP request.
+(defn global-cursor-read []
+  (let [state (php/get_option state-option nil)]
+    (if (php/is_array state)
+      state
+      (default-state))))
+
+(defn state-value [state key fallback]
+  (let [value (php/aget state key)]
+    (if (nil? value) fallback value)))
+
+(defn state-revision [state]
+  (php/intval (state-value state "revision" 0)))
+
+(defn state-message [state]
+  (str (state-value state "message" "")))
+
+(defn current-user-name []
+  (.-user_login (php/wp_get_current_user)))
+
+(defn next-state [state message]
+  #php {"revision" (+ 1 (state-revision state))
+        "message" message
+        "updated_by" (current-user-name)
+        "updated_at" (php/current_time "mysql")})
+
+(defn global-cursor-write! [state]
+  (php/update_option state-option state)
+  state)
+
+;; Hyper-like reactive region. Polling never tries to maintain a server-side
+;; component instance: when its dependency revision changed, this function is
+;; simply run again in a fresh PHP-FPM request.
+(defn reactive-region [state]
+  [:div {:id "phel-collab-region"
+         :data-revision (state-revision state)}
+   [:p
+    [:strong "Shared note (revision " (state-revision state) ")"]]
+   [:blockquote (state-message state)]
+   [:p {:class "description"}
+    "Last changed by "
+    (str (state-value state "updated_by" "Unknown"))
+    (let [updated-at (state-value state "updated_at" "")]
+      (if (= "" updated-at)
+        "."
+        (str " at " updated-at ".")))]] )
+
+(defn render-reactive-region [state]
+  (html (reactive-region state)))
+
+(defn response-payload [state changed]
+  #php {"revision" (state-revision state)
+        "changed" changed
+        "html" (if changed (render-reactive-region state) "")})
+
+(defn plugin-main-file []
+  (str (php/dirname (php/dirname *file*)) "/phel-wp-plugin.php"))
+
+(defn enqueue-assets [hook-suffix]
+  ;; The prototype lives only on Dashboard. This avoids increasing Heartbeat
+  ;; frequency on unrelated wp-admin screens.
+  (when (= "index.php" hook-suffix)
+    (php/wp_enqueue_script
+     "phel-collab-demo"
+     (str (php/plugin_dir_url (plugin-main-file)) "assets/collab-demo.js")
+     #php ["jquery" "heartbeat"]
+     "0.1.0"
+     true)))
+
+(defn collab-widget-content []
+  (let [state (global-cursor-read)]
+    (println
+     (html
+      [:div {:id "phel-collab-demo"
+             :data-revision (state-revision state)
+             :data-ajax-url (php/admin_url "admin-ajax.php")
+             :data-nonce (php/wp_create_nonce nonce-action)}
+       [:p
+        "This prototype maps Hyper's reactive regions onto short PHP-FPM "
+        "requests. The editing tab updates immediately; other open dashboards "
+        "observe the new revision on WordPress Heartbeat (about five seconds "
+        "while the tab is active)."]
+       (reactive-region state)
+       [:hr]
+       [:p [:strong "Tab-local edit"]]
+       [:textarea {:id "phel-collab-message"
+                   :rows 4
+                   :style "width:100%;box-sizing:border-box;"}
+        (state-message state)]
+       [:p
+        [:button {:id "phel-collab-save"
+                  :class "button button-primary"
+                  :type "button"}
+         "Save shared note"]
+        " "
+        [:button {:id "phel-collab-refresh"
+                  :class "button"
+                  :type "button"}
+         "Poll now"]]
+       [:p {:id "phel-collab-status"
+            :class "description"}
+        "Waiting for changes from collaborators."]]))))
+
+(defn heartbeat-received [response data screen-id]
+  (let [request (php/aget data "phel_collab")]
+    (if (php/is_array request)
+      (let [state (global-cursor-read)
+            known-revision (php/intval (php/aget request "revision"))
+            changed (not (= known-revision (state-revision state)))]
+        ;; The unchanged path returns only a few scalars; HTML is rendered only
+        ;; when this client's declared dependency revision is stale.
+        (php/aset response "phel_collab" (response-payload state changed))
+        response)
+      response)))
+
+(defn request-param [key fallback]
+  (let [value (php/aget php/$_POST key)]
+    (if (nil? value)
+      fallback
+      (php/wp_unslash value))))
+
+(defn ajax-mutate []
+  (php/check_ajax_referer nonce-action "nonce")
+  (if (not (php/current_user_can "edit_posts"))
+    (php/wp_send_json_error #php {"code" "forbidden"} 403)
+    (let [operation (str (request-param "operation" ""))
+          state (global-cursor-read)
+          based-on-revision (php/intval (request-param "revision" -1))]
+      (if (not (= "save-message" operation))
+        (php/wp_send_json_error #php {"code" "unknown_operation"} 400)
+        (if (not (= based-on-revision (state-revision state)))
+          ;; Optimistic conflict detection keeps a stale browser from silently
+          ;; overwriting a change it has not observed yet.
+          (php/wp_send_json_error
+           #php {"code" "conflict"
+                 "revision" (state-revision state)
+                 "changed" true
+                 "html" (render-reactive-region state)}
+           409)
+          (let [message (php/sanitize_textarea_field
+                         (str (request-param "message" "")))
+                new-state (global-cursor-write! (next-state state message))]
+            (php/wp_send_json_success (response-payload new-state true))))))))
+
+(defn register! []
+  (php/add_action "admin_enqueue_scripts" enqueue-assets 10 1)
+  (php/add_filter "heartbeat_received" heartbeat-received 10 3)
+  (php/add_action "wp_ajax_phel_collab_mutate" ajax-mutate)
+  (php/add_action
+   "wp_dashboard_setup"
+   #(php/wp_add_dashboard_widget
+     "phel-collab-demo-widget"
+     "Phel collaborative polling prototype"
+     collab-widget-content)))

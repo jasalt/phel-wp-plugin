@@ -1,28 +1,34 @@
 (ns phel-wp-plugin.main
-  (:require phel.html :refer [html]))
-
-(def posts (php/get_posts
-            #php {"post_type" "post"
-                  "numberposts" 2}))
+  (:require phel.html :refer [html])
+  (:require phel-wp-plugin.collab :as collab))
 
 (defn current-user-name []
-  (.user_login (php/wp_get_current_user)))
+  (.-user_login (php/wp_get_current_user)))
 
 (defn phel-widget-content []
-  (println "Hello, World!")
-  (println "Your WordPress account name is: ")
-  (println (current-user-name))
-
-  (println (html [:div
-                  [:h2 "All Posts"]
-                  [:ul
-                   (for [item :in posts]
-                     [:li
-                      (.post_title item) " "
-                      [:a {:href (php/get_permalink item)} "hyperlink"]])]])))
+  ;; Keep request work out of namespace initialization. In particular, the
+  ;; collaborative prototype below uses WordPress Heartbeat every five seconds.
+  (let [posts (php/get_posts
+               #php {"post_type" "post"
+                     "numberposts" 2})]
+    (println "Hello, World!")
+    (println "Your WordPress account name is: ")
+    (println (current-user-name))
+    (println (html [:div
+                    [:h2 "All Posts"]
+                    [:ul
+                     (for [item :in posts]
+                       [:li
+                        (.-post_title item) " "
+                        [:a {:href (php/get_permalink item)} "hyperlink"]])]]))))
 
 (php/add_action "wp_dashboard_setup"
                 #(php/wp_add_dashboard_widget
                   "phel-widget-id"
                   "This is Phel content"
                   phel-widget-content))
+
+;; Hyper-inspired, PHP-FPM-friendly collaborative demo. Shared state lives in
+;; WordPress, actions are short AJAX requests, and Heartbeat is only a cheap
+;; invalidation/revision poll. No PHP worker is held between requests.
+(collab/register!)
