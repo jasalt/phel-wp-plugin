@@ -1,5 +1,6 @@
 (ns phel-wp-plugin.collab
-  (:require phel.html :refer [html]))
+  (:require phel.html :refer [html])
+  (:require phel-wp-plugin.datastar :as datastar))
 
 (def state-option "phel_collab_demo_state")
 (def nonce-action "phel_collab_demo")
@@ -41,9 +42,6 @@
   (php/update_option state-option state)
   state)
 
-;; Hyper-like reactive region. Polling never tries to maintain a server-side
-;; component instance: when its dependency revision changed, this function is
-;; simply run again in a fresh PHP-FPM request.
 (defn reactive-region [state]
   [:div {:id "phel-collab-region"
          :data-revision (state-revision state)}
@@ -61,70 +59,91 @@
 (defn render-reactive-region [state]
   (html (reactive-region state)))
 
-(defn response-payload [state changed]
-  #php {"revision" (state-revision state)
-        "changed" changed
-        "html" (if changed (render-reactive-region state) "")})
+(defn state-patches [state]
+  [{:selector "#phel-collab-region"
+    :mode "outer"
+    :element (render-reactive-region state)}
+   {:signals (php/wp_json_encode
+              #php {"revision" (state-revision state)
+                    "message" (state-message state)})}])
 
 (defn plugin-main-file []
   (str (php/dirname (php/dirname *file*)) "/phel-wp-plugin.php"))
 
+(defn datastar-action-url [action]
+  (php/add_query_arg
+   #php {"action" action
+         "nonce" (php/wp_create_nonce nonce-action)}
+   (php/admin_url "admin-ajax.php")))
+
+(defn datastar-post-expression [action]
+  (str "@post('" (datastar-action-url action)
+       "', {contentType: 'form', requestCancellation: 'auto'})"))
+
+(defn initial-signals [state]
+  ;; The only browser state is the form currently being edited and its version.
+  ;; WordPress remains authoritative for the shared note itself.
+  (str "{revision: " (state-revision state)
+       ", message: " (php/wp_json_encode (state-message state)) "}"))
+
+(defn datastar-script-tag [tag handle source]
+  ;; This WordPress version does not honor wp_script_add_data's `type` field.
+  ;; Datastar is an ES module, so replace only its script tag at render time.
+  (if (= "phel-datastar" handle)
+    (str "<script type=\"module\" id=\"phel-datastar-js\" src=\""
+         (php/esc_url source) "\"></script>\n")
+    tag))
+
 (defn enqueue-assets [hook-suffix]
-  ;; The prototype lives only on Dashboard. This avoids increasing Heartbeat
-  ;; frequency on unrelated wp-admin screens.
   (when (= "index.php" hook-suffix)
     (php/wp_enqueue_script
-     "phel-collab-demo"
-     (str (php/plugin_dir_url (plugin-main-file)) "assets/collab-demo.js")
-     #php ["jquery" "heartbeat"]
-     "0.1.0"
+     "phel-datastar"
+     "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.2/bundles/datastar.js"
+     #php []
+     "1.0.2"
      true)))
 
 (defn collab-widget-content []
   (let [state (global-cursor-read)]
     (println
      (html
-      [:div {:id "phel-collab-demo"
-             :data-revision (state-revision state)
-             :data-ajax-url (php/admin_url "admin-ajax.php")
-             :data-nonce (php/wp_create_nonce nonce-action)}
+      [:form {:id "phel-collab-demo"
+              :data-signals (initial-signals state)
+              :data-on-interval__duration.5s (datastar-post-expression "phel_collab_heartbeat")}
        [:p
-        "This prototype maps Hyper's reactive regions onto short PHP-FPM "
-        "requests. The editing tab updates immediately; other open dashboards "
-        "observe the new revision on WordPress Heartbeat (about five seconds "
-        "while the tab is active)."]
+        "This prototype uses Datastar's five-second interval heartbeat. "
+        "Each poll is a short request whose finite SSE response morphs the "
+        "shared region from WordPress's authoritative state."]
        (reactive-region state)
+       [:input {:type "hidden"
+                :name "revision"
+                :data-bind:revision ""}]
        [:hr]
        [:p [:strong "Tab-local edit"]]
        [:textarea {:id "phel-collab-message"
+                   :name "message"
                    :rows 4
-                   :style "width:100%;box-sizing:border-box;"}
-        (state-message state)]
-       [:p
+                   :style "width:100%;box-sizing:border-box;"
+                   :data-bind:message ""}]
+       [:p {:data-indicator:saving ""}
         [:button {:id "phel-collab-save"
                   :class "button button-primary"
-                  :type "button"}
+                  :type "button"
+                  :data-on:click (datastar-post-expression "phel_collab_mutate")}
          "Save shared note"]
         " "
         [:button {:id "phel-collab-refresh"
                   :class "button"
-                  :type "button"}
+                  :type "button"
+                  :data-on:click (datastar-post-expression "phel_collab_heartbeat")}
          "Poll now"]]
        [:p {:id "phel-collab-status"
-            :class "description"}
-        "Waiting for changes from collaborators."]]))))
-
-(defn heartbeat-received [response data screen-id]
-  (let [request (php/aget data "phel_collab")]
-    (if (php/is_array request)
-      (let [state (global-cursor-read)
-            known-revision (php/intval (php/aget request "revision"))
-            changed (not (= known-revision (state-revision state)))]
-        ;; The unchanged path returns only a few scalars; HTML is rendered only
-        ;; when this client's declared dependency revision is stale.
-        (php/aset response "phel_collab" (response-payload state changed))
-        response)
-      response)))
+            :class "description"
+            :aria-live "polite"
+            :data-indicator:saving ""}
+        [:span {:data-show "$saving"} "Saving shared note..."]
+        [:span {:data-show "!$saving"}
+         "Waiting for changes from collaborators."]]]))))
 
 (defn request-param [key fallback]
   (let [value (php/aget php/$_POST key)]
@@ -132,36 +151,44 @@
       fallback
       (php/wp_unslash value))))
 
-(defn ajax-mutate []
+(defn require-edit-posts! []
+  (when-not (php/current_user_can "edit_posts")
+    (php/wp_die "You are not allowed to edit this note." "Forbidden"
+                #php {"response" 403})))
+
+(defn ajax-heartbeat []
+  (datastar/start!)
   (php/check_ajax_referer nonce-action "nonce")
-  (if (not (php/current_user_can "edit_posts"))
-    (php/wp_send_json_error #php {"code" "forbidden"} 403)
-    (let [operation (str (request-param "operation" ""))
-          state (global-cursor-read)
-          based-on-revision (php/intval (request-param "revision" -1))]
-      (if (not (= "save-message" operation))
-        (php/wp_send_json_error #php {"code" "unknown_operation"} 400)
-        (if (not (= based-on-revision (state-revision state)))
-          ;; Optimistic conflict detection keeps a stale browser from silently
-          ;; overwriting a change it has not observed yet.
-          (php/wp_send_json_error
-           #php {"code" "conflict"
-                 "revision" (state-revision state)
-                 "changed" true
-                 "html" (render-reactive-region state)}
-           409)
-          (let [message (php/sanitize_textarea_field
-                         (str (request-param "message" "")))
-                new-state (global-cursor-write! (next-state state message))]
-            (php/wp_send_json_success (response-payload new-state true))))))))
+  (require-edit-posts!)
+  (let [state (global-cursor-read)
+        known-revision (php/intval (request-param "revision" -1))]
+    (if (= known-revision (state-revision state))
+      (datastar/emit! [])
+      (datastar/emit! (state-patches state)))))
+
+(defn ajax-mutate []
+  (datastar/start!)
+  (php/check_ajax_referer nonce-action "nonce")
+  (require-edit-posts!)
+  (let [state (global-cursor-read)
+        based-on-revision (php/intval (request-param "revision" -1))]
+    (if (not (= based-on-revision (state-revision state)))
+      ;; A stale editor is shown the source-of-truth region and receives the
+      ;; current form signals instead of silently overwriting a collaborator.
+      (datastar/emit! (state-patches state))
+      (let [message (php/sanitize_textarea_field
+                     (str (request-param "message" "")))
+            new-state (global-cursor-write! (next-state state message))]
+        (datastar/emit! (state-patches new-state))))))
 
 (defn register! []
   (php/add_action "admin_enqueue_scripts" enqueue-assets 10 1)
-  (php/add_filter "heartbeat_received" heartbeat-received 10 3)
+  (php/add_filter "script_loader_tag" datastar-script-tag 10 3)
+  (php/add_action "wp_ajax_phel_collab_heartbeat" ajax-heartbeat)
   (php/add_action "wp_ajax_phel_collab_mutate" ajax-mutate)
   (php/add_action
    "wp_dashboard_setup"
    #(php/wp_add_dashboard_widget
      "phel-collab-demo-widget"
-     "Phel collaborative polling prototype"
+     "Phel collaborative Datastar prototype"
      collab-widget-content)))

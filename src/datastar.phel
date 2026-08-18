@@ -1,0 +1,52 @@
+(ns phel-wp-plugin.datastar
+  (:require phel.string :as string))
+
+(defn event-lines [key value]
+  "Prefix every fragment line as an SSE data field."
+  (for [line :in (string/split-lines (str value))]
+    (str "data: " key " " line "\n")))
+
+(defn patch-elements-event [{:keys [selector mode element use-view-transition view-transition-selector]}]
+  "Format one complete Datastar patch-elements event."
+  (str "event: datastar-patch-elements\n"
+       (when selector (str "data: selector " selector "\n"))
+       (str "data: mode " (or mode "outer") "\n")
+       (when use-view-transition "data: useViewTransition true\n")
+       (when view-transition-selector
+         (str "data: viewTransitionSelector " view-transition-selector "\n"))
+       (string/join "" (event-lines "elements" element))
+       "\n"))
+
+(defn patch-signals-event [signals]
+  "Format one complete Datastar patch-signals event. `signals` is JSON."
+  (str "event: datastar-patch-signals\n"
+       (string/join "" (event-lines "signals" signals))
+       "\n"))
+
+(defn stream [patches]
+  "Build a finite stream from response-neutral patch data."
+  (string/join ""
+               (for [patch :in patches]
+                 (if (get patch :signals)
+                   (patch-signals-event (get patch :signals))
+                   (patch-elements-event patch)))))
+
+(defn start! []
+  "Buffer AJAX-side effects before application code emits output."
+  (php/ob_start))
+
+(defn discard-buffers! []
+  "Discard warnings and incidental output from all active PHP buffers."
+  (while (> (php/ob_get_level) 0)
+    (php/ob_end_clean)))
+
+(defn emit! [patches]
+  "Emit a finite Datastar SSE stream and terminate the WordPress request."
+  (let [stream-data (stream patches)]
+    (discard-buffers!)
+    (php/header "Content-Type: text/event-stream; charset=utf-8")
+    (php/header "Cache-Control: no-cache, no-store")
+    (php/header "X-Accel-Buffering: no")
+    (php/echo stream-data)
+    (php/flush)
+    (php/exit)))
