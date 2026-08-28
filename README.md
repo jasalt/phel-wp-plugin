@@ -16,7 +16,7 @@ Plugin sets up a simple admin widget querying the database and rendering HTML us
 # Installation
 ## Existing WordPress installation
 
-Requires PHP 8.3+ and Composer.
+Requires PHP 8.4+ and Composer.
 
 1) Clone this repository into plugins directory of an existing WordPress installation e.g. `wp-content/plugins/phel-wp-plugin`.
 2) Install Composer dependencies `cd phel-wp-plugin && composer install`.
